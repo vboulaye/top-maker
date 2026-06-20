@@ -76,9 +76,9 @@ export async function undo() {
   if (!s) return false;
 
   // dynamic imports to avoid module cycles
-  const { replaceItems } = await import('$lib/stores/itemsStore');
-  const { replaceRankings } = await import('$lib/stores/rankingStore');
-  const { replaceComparisons } = await import('$lib/stores/comparisonsStore');
+  const { replaceItems } = await import('./itemsStore');
+  const { replaceRankings } = await import('./rankingStore');
+  const { replaceComparisons } = await import('./comparisonsStore');
 
   if (s.items) await replaceItems(s.items);
   if (s.rankings) await replaceRankings(s.rankings);
