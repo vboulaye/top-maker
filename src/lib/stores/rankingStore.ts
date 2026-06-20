@@ -1,5 +1,6 @@
 
 import { openDB } from 'idb';
+import { writable } from 'svelte/store';
 import type { RankingKey } from '$lib/types';
 
 const DB_NAME = 'topmaker';
@@ -11,14 +12,33 @@ function keyFor(k: RankingKey) {
   return `${k.type}:${k.year ?? 'all'}`;
 }
 
-export async function getRanking(key: RankingKey) {
+// rankings: map key -> array of ids
+export const rankings = writable<Record<string, string[]>>({});
+
+(async () => {
   const db = await dbPromise;
-  return (await db.get('rankings', keyFor(key))) || [];
+  const allKeys = await db.getAllKeys('rankings');
+  const map: Record<string,string[]> = {};
+  for (const k of allKeys) {
+    const val = await db.get('rankings', k as any);
+    map[k as string] = val || [];
+  }
+  rankings.set(map);
+})();
+
+export async function getRanking(key: RankingKey) {
+  const k = keyFor(key);
+  let found: string[] | undefined;
+  rankings.subscribe(m => { if (m[k]) found = m[k]; })();
+  if (found) return found;
+  const db = await dbPromise;
+  return (await db.get('rankings', k)) || [];
 }
 
-export async function setRanking(key: RankingKey, ranking: any) {
+export async function setRanking(key: RankingKey, ranking: string[]) {
   const db = await dbPromise;
   await db.put('rankings', ranking, keyFor(key));
+  rankings.update(m => ({ ...m, [keyFor(key)]: ranking }));
 }
 
 export async function insertAt(key: RankingKey, index: number, itemId: string) {
