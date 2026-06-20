@@ -55,3 +55,26 @@ export async function listItems() {
   const db = await dbPromise;
   return db.getAll('items');
 }
+
+export async function exportItems() {
+  // return current in-memory snapshot of items
+  let current: Record<string, Item> = {};
+  items.subscribe((value) => {
+    current = value;
+  })();
+  return current;
+}
+
+export async function replaceItems(next: Record<string, Item>) {
+  // replace in-memory
+  items.set(next);
+  // replace persisted
+  if (!browser || !dbPromise) return;
+  const db = await dbPromise;
+  const tx = db.transaction('items', 'readwrite');
+  await tx.store.clear();
+  for (const value of Object.values(next)) {
+    await tx.store.put(value);
+  }
+  await tx.done;
+}

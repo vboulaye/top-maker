@@ -1,16 +1,15 @@
-import { describe, it, expect } from 'vitest';
-import { addItem, getItem, listItems } from '../../lib/stores/itemsStore';
+import { describe, expect, it } from 'vitest';
+import { addItem, exportItems, replaceItems } from '../../lib/stores/itemsStore';
 
-describe('itemsStore', () => {
-  it('adds and retrieves an item', async () => {
-    const item = { id: 'i1', type: 'concert', createdAt: new Date().toISOString(), data: { artist: 'A', date: '2026-01-01', venue: 'V' } };
-    await addItem(item);
-    const got = await getItem('i1');
-    expect(got.id).toBe(item.id);
-  });
+describe('itemsStore replaceItems', () => {
+  it('replaces the in-memory and persisted item set', async () => {
+    await addItem({ id: 'old', type: 'concert', createdAt: '2026-06-20T00:00:00.000Z', data: { artist: 'Old', date: '2026-06-20', venue: 'X' } });
 
-  it('lists items', async () => {
-    const items = await listItems();
-    expect(Array.isArray(items)).toBe(true);
+    await replaceItems({
+      fresh: { id: 'fresh', type: 'concert', createdAt: '2026-06-20T00:00:00.000Z', data: { artist: 'Fresh', date: '2026-06-21', venue: 'Y' } }
+    });
+
+    const exported = await exportItems();
+    expect(Object.keys(exported)).toEqual(['fresh']);
   });
 });

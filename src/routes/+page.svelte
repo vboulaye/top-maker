@@ -2,6 +2,7 @@
   import AddItemModal from '$lib/components/AddItemModal.svelte';
   import ComparisonModal from '$lib/components/ComparisonModal.svelte';
   import RankedList from '$lib/components/RankedList.svelte';
+  import { storageStatus, exportJsonFile, importJsonText, openFromFileHandle, saveToFileHandle } from '$lib/stores/storageStore';
   import { items } from '$lib/stores/itemsStore';
   import { addItem } from '$lib/stores/itemsStore';
   import { rankings, getRanking, insertAt } from '$lib/stores/rankingStore';
@@ -76,6 +77,25 @@
   <p>Track and compare your best concerts of the year.</p>
 
   <button on:click={() => (showAdd = true)}>Add</button>
+  <button on:click={() => exportJsonFile()}>Export JSON</button>
+  <label style="display:inline-block; margin-left:8px;">
+    Import JSON
+    <input
+      type="file"
+      accept="application/json"
+      on:change={async (e) => {
+        const f = e.target.files && e.target.files[0];
+        if (!f) return;
+        const text = await f.text();
+        await importJsonText(text);
+      }}
+    />
+  </label>
+
+  {#if $storageStatus.canUseFileSystemApi}
+    <button on:click={() => openFromFileHandle()}>Open File</button>
+    <button on:click={() => saveToFileHandle()}>Save File</button>
+  {/if}
 
   {#if showAdd}
     <AddItemModal on:add={(ev) => (ev.detail.rank ? onAddAndRank(ev.detail.data) : onAddWithoutRanking(ev.detail.data))} />
@@ -90,4 +110,10 @@
   {/if}
 
   <RankedList items={itemsForDisplay} />
+  {#if $storageStatus.lastAction}
+    <div class="storage-status">{$storageStatus.lastAction}</div>
+  {/if}
+  {#if $storageStatus.lastError}
+    <div role="alert" class="storage-error">{$storageStatus.lastError}</div>
+  {/if}
 </main>

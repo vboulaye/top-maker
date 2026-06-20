@@ -28,6 +28,24 @@ export async function recordComparison(entry: ComparisonEntry) {
   comparisons.update(a => [...a, entry]);
 }
 
+export async function exportComparisons() {
+  let current: ComparisonEntry[] = [];
+  comparisons.subscribe((v) => (current = v))();
+  return current;
+}
+
+export async function replaceComparisons(next: ComparisonEntry[]) {
+  comparisons.set(next || []);
+  if (!browser || !dbPromise) return;
+  const db = await dbPromise;
+  const tx = db.transaction('comparisons', 'readwrite');
+  await tx.store.clear();
+  for (const item of next) {
+    await tx.store.put(item);
+  }
+  await tx.done;
+}
+
 export async function latestBetween(aId: string, bId: string) {
   if (!browser || !dbPromise) return null;
   const db = await dbPromise;

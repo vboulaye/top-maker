@@ -53,3 +53,21 @@ export async function insertAt(key: RankingKey, index: number, itemId: string) {
   ranking.splice(index, 0, itemId);
   await setRanking(key, ranking);
 }
+
+export async function exportRankings() {
+  let current: Record<string, string[]> = {};
+  rankings.subscribe((v) => (current = v))();
+  return current;
+}
+
+export async function replaceRankings(next: Record<string, string[]>) {
+  rankings.set(next);
+  if (!browser || !dbPromise) return;
+  const db = await dbPromise;
+  const tx = db.transaction('rankings', 'readwrite');
+  await tx.store.clear();
+  for (const [k, v] of Object.entries(next)) {
+    await tx.store.put(v, k);
+  }
+  await tx.done;
+}
