@@ -121,6 +121,9 @@
   <label>Venue<input name="venue" bind:value={venue} /></label>
   <div class="actions">
     <button on:click={addAndRank}>Add and Rank</button>
+    <button on:click={() => { fastEntry = ''; fastError = null; artist = ''; date = ''; venue = ''; dispatch('cancel'); }}>
+      Cancel
+    </button>
   </div>
 </div>
 

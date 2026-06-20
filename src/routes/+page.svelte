@@ -100,7 +100,10 @@
   {/if}
 
   {#if showAdd}
-    <AddItemModal on:add={(ev) => (ev.detail.rank ? onAddAndRank(ev.detail.data) : onAddWithoutRanking(ev.detail.data))} />
+    <AddItemModal
+      on:add={(ev) => (ev.detail.rank ? onAddAndRank(ev.detail.data) : onAddWithoutRanking(ev.detail.data))}
+      on:cancel={() => (showAdd = false)}
+    />
   {/if}
 
   {#if showCompare && comparePair}
