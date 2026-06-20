@@ -1,13 +1,13 @@
 <script lang="ts">
   import ItemCard from './ItemCard.svelte';
-  export let items: any[] = [];
+  export let items: any[] = []; // array of item objects
 </script>
 
 <div class="ranked-list">
-  {#each items as id, i}
+  {#each items as item, i}
     <div class="rank-row">
       <div class="pos">#{i+1}</div>
-      <ItemCard item={id} />
+      <ItemCard {item} />
     </div>
   {/each}
 </div>

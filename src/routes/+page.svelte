@@ -85,13 +85,15 @@
   <!-- show ranking -->
   <script lang="ts">
     import RankedList from '$lib/components/RankedList.svelte';
-    import { getItem } from '$lib/stores/itemsStore';
+    import { items } from '$lib/stores/itemsStore';
+    import { rankings } from '$lib/stores/rankingStore';
+    // local reactive state using Svelte reactive $ syntax
     let itemsForDisplay = [];
-    $: (async () => {
-      const ids = await getRanking({ type: 'concert' });
-      const items = await Promise.all((ids||[]).map((id) => getItem(id)));
-      itemsForDisplay = items;
-    })();
+    $: {
+      const key = 'concert:' + (new Date().getFullYear());
+      const ids = ($rankings && $rankings[key]) || [];
+      itemsForDisplay = ids.map(id => $items[id]).filter(Boolean);
+    }
   </script>
 
   <RankedList items={itemsForDisplay} />
