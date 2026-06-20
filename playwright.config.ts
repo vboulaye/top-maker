@@ -4,7 +4,9 @@ export default defineConfig({
   testDir: './playwright',
   timeout: 30_000,
   expect: { timeout: 5000 },
-  fullyParallel: true,
+  // Run tests serially to avoid shared application state interference (IndexedDB, file handles)
+  fullyParallel: false,
+  workers: 1,
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chromium'] } }
   ],

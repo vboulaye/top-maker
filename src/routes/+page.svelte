@@ -3,7 +3,7 @@
   import ComparisonModal from '$lib/components/ComparisonModal.svelte';
   import RankedList from '$lib/components/RankedList.svelte';
   import { storageStatus, exportJsonFile, importJsonText, openFromFileHandle, saveToFileHandle } from '$lib/stores/storageStore';
-  import { lastSnapshot, lastActionLabel, undo } from '$lib/stores/undoStore';
+  // undo feature removed
   import { items } from '$lib/stores/itemsStore';
   import { addItem } from '$lib/stores/itemsStore';
   import { rankings, getRanking, insertAt } from '$lib/stores/rankingStore';
@@ -25,7 +25,7 @@
   }
 
   async function onAddAndRank(data: { artist: string; date: string; venue: string }) {
-    const id = `i_${Date.now()}`;
+    const id = `i_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
     const item = { id, type: 'concert', createdAt: new Date().toISOString(), data };
     await addItem(item);
 
@@ -41,7 +41,7 @@
   }
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {
-    const id = `i_${Date.now()}`;
+    const id = `i_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
     const item = { id, type: 'concert', createdAt: new Date().toISOString(), data };
     await addItem(item);
     const ranking = await getRanking(rankingKey);
@@ -79,9 +79,7 @@
 
   <button on:click={() => (showAdd = true)}>Add</button>
   <button on:click={() => exportJsonFile()}>Export JSON</button>
-  {#if $lastSnapshot}
-    <button on:click={async () => { await undo(); }}>Undo: {$lastActionLabel}</button>
-  {/if}
+  <!-- Undo button removed -->
   <label style="display:inline-block; margin-left:8px;">
     Import JSON
     <input

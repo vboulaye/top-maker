@@ -1,37 +1,131 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   export let onAddAndRank: (data: any) => void;
-  export let onAddWithoutRanking: (data: any) => void;
 
   let artist = '';
   let date = '';
   let venue = '';
+  let fastEntry = '';
+  let fastError: string | null = null;
 
   const dispatch = createEventDispatcher();
 
   function addAndRank() {
-    const data = { artist, date, venue };
+    // prefer fastEntry if present
+    const parsed = fastEntry && fastEntry.trim().length > 0 ? parseFastEntry(fastEntry) : null;
+    const data = parsed ? { artist: parsed.artist || '', date: parsed.date || '', venue: parsed.venue || '' } : { artist, date, venue };
+    // clear fastEntry after using it
+    if (parsed) fastEntry = '';
     if (onAddAndRank) onAddAndRank(data);
     dispatch('add', { data, rank: true });
   }
-  function addWithout() {
-    const data = { artist, date, venue };
-    if (onAddWithoutRanking) onAddWithoutRanking(data);
-    dispatch('add', { data, rank: false });
+
+  // Parse fast-entry format: "Artist [YYYY-MM-DD Location...]"
+  function parseFastEntry(text: string): { artist: string; date?: string; venue?: string } | null {
+    let trimmed = (text || '').trim();
+    if (!trimmed) return null;
+
+    // If there is a slash, prefer the substring after the last slash (ignore file paths/prefixes)
+    const lastSlash = trimmed.lastIndexOf('/');
+    if (lastSlash >= 0) trimmed = trimmed.slice(lastSlash + 1).trim();
+
+    // If there's a closing bracket, ignore anything after the first closing bracket
+    const firstClose = trimmed.indexOf(']');
+    if (firstClose >= 0) trimmed = trimmed.slice(0, firstClose + 1).trim();
+
+    // Find artist and bracket content using explicit indices for robustness
+    const openIdx = trimmed.indexOf('[');
+    const closeIdx = trimmed.indexOf(']');
+    if (openIdx === -1 || closeIdx === -1 || closeIdx <= openIdx) {
+      // no bracketed metadata — treat whole string (without extension) as artist
+      const noExt = trimmed.replace(/\.[^.\s]{1,5}$/, '').trim();
+      return { artist: noExt };
+    }
+
+    const artistPart = trimmed.slice(0, openIdx).trim();
+    const inside = trimmed.slice(openIdx + 1, closeIdx).trim();
+    if (!inside) return { artist: artistPart };
+
+    // inside may be: "YYYY-MM-DD Location..." or just "Location" or just "YYYY-MM-DD"
+    const isoMatch = inside.match(/^(\d{4}-\d{2}-\d{2})(?:\s+(.*))?$/);
+    if (isoMatch) {
+      const isoDate = isoMatch[1];
+      const venuePart = (isoMatch[2] || '').trim();
+      return { artist: artistPart, date: isoDate, venue: venuePart };
+    }
+
+    // fallback: no iso date, treat whole inside as venue
+    return { artist: artistPart, date: '', venue: inside };
+  }
+
+  function submitFastEntry() {
+    fastError = null;
+    const parsed = parseFastEntry(fastEntry || '');
+    if (!parsed) return;
+
+    // If bracket existed but date is non-empty and invalid, show error
+    if (fastEntry.includes('[') && fastEntry.includes(']')) {
+      const inside = fastEntry.replace(/^[^[]*\[|\].*$/g, '').trim();
+      // if inside starts with something that looks date-like but not iso, treat as error
+      const first = inside.split(/\s+/)[0] || '';
+      if (first && /^\d{1,4}[-\/]\d{1,2}[-\/]?\d{0,2}$/.test(first) && !/^\d{4}-\d{2}-\d{2}$/.test(first)) {
+        fastError = 'Date must be in ISO format YYYY-MM-DD inside brackets.';
+        return;
+      }
+    }
+
+    // Populate fields and submit as Add Without Ranking
+    artist = parsed.artist || '';
+    date = parsed.date || '';
+    venue = parsed.venue || '';
+    // clear fast entry
+    fastEntry = '';
+    addWithout();
+  }
+
+  // Live-parse fastEntry so clicking "Add and Rank" uses parsed values
+  $: if (fastEntry && fastEntry.trim().length > 0) {
+    const p = parseFastEntry(fastEntry);
+    if (p) {
+      // populate fields but do not clear fastEntry
+      artist = p.artist || '';
+      date = p.date || '';
+      venue = p.venue || '';
+      fastError = null;
+    }
   }
 </script>
 
 <div class="modal">
-  <label>Artist<input bind:value={artist} /></label>
-  <label>Date<input type="date" bind:value={date} /></label>
-  <label>Venue<input bind:value={venue} /></label>
+  <label>Fast entry
+    <input
+      placeholder="Coldplay [2026-06-20 Royal Albert Hall]"
+      bind:value={fastEntry}
+      on:keydown={(e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          submitFastEntry();
+        }
+        if (e.key === 'Escape') {
+          fastEntry = '';
+          fastError = null;
+        }
+      }}
+    />
+  </label>
+  {#if fastError}
+    <div role="alert" class="fast-error">{fastError}</div>
+  {/if}
+  <label>Artist<input name="artist" bind:value={artist} /></label>
+  <label>Date<input name="date" type="date" bind:value={date} /></label>
+  <label>Venue<input name="venue" bind:value={venue} /></label>
   <div class="actions">
     <button on:click={addAndRank}>Add and Rank</button>
-    <button on:click={addWithout}>Add Without Ranking</button>
   </div>
 </div>
 
 <style>
 label { display:block; margin:0.5rem 0 }
 .actions { margin-top:1rem }
+.fast-error { color: #b00020; font-size: 0.9rem; margin-top: 0.25rem }
 </style>

@@ -41,17 +41,7 @@ export async function getRanking(key: RankingKey) {
 }
 
 export async function setRanking(key: RankingKey, ranking: string[]) {
-  // record undo snapshot (previous rankings) before mutating
-  try {
-    if (typeof window !== 'undefined') {
-      const { recordUndoSnapshot } = await import('$lib/stores/undoStore');
-      let current: Record<string, string[]> = {};
-      rankings.subscribe((v) => (current = v))();
-      await recordUndoSnapshot(`Updated rankings`, { rankings: current });
-    }
-  } catch (e) {
-    // ignore
-  }
+  // undo support removed; no-op
 
   if (browser && dbPromise) {
     const db = await dbPromise;
@@ -62,8 +52,10 @@ export async function setRanking(key: RankingKey, ranking: string[]) {
 
 export async function insertAt(key: RankingKey, index: number, itemId: string) {
   const ranking = await getRanking(key);
-  ranking.splice(index, 0, itemId);
-  await setRanking(key, ranking);
+  // avoid mutating the existing array in-place so undo snapshots capture the previous state
+  const next = [...ranking];
+  next.splice(index, 0, itemId);
+  await setRanking(key, next);
 }
 
 export async function exportRankings() {

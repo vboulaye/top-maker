@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "playwright": "playwright test",
+    "e2e": "node scripts/run-playwright.cjs",
     "playwright:playwright test --config": "playwright.config.ts"
   },
   "devDependencies": {

@@ -9,10 +9,13 @@ test('export then import JSON restores state', async ({ page, browser }) => {
 
   // Add an item using the Add button and form
   await page.click('button:has-text("Add")');
-  await page.fill('input[name="artist"]', 'Playwright Artist');
-  await page.fill('input[name="date"]', '2026-06-20');
-  await page.fill('input[name="venue"]', 'Test Venue');
-  await page.click('button:has-text("Save")');
+  await page.locator('div.modal').waitFor({ state: 'visible' });
+  await page.getByLabel('Artist').waitFor({ state: 'visible' });
+  await page.getByLabel('Artist').fill('Playwright Artist');
+  await page.getByLabel('Date').fill('2026-06-20');
+  await page.getByLabel('Venue').fill('Test Venue');
+  // Use the modal Add button
+  await page.click('button:has-text("Add and Rank")');
 
   // Ensure the item appears in the list
   await expect(page.locator('text=Playwright Artist')).toHaveCount(1);
