@@ -30,8 +30,9 @@
   });
 </script>
 
-<div class="modal" role="dialog" aria-modal="true">
-  <div class="cards">
+<div class="modal-backdrop" role="dialog" aria-modal="true">
+  <div class="modal">
+    <div class="cards">
     <article aria-label="Item A" class="card">
       <div class="title">{itemA?.data?.artist ?? itemA?.id}</div>
       <div class="meta">{itemA?.data?.date} — {itemA?.data?.venue}</div>
@@ -40,13 +41,14 @@
       <div class="title">{itemB?.data?.artist ?? itemB?.id}</div>
       <div class="meta">{itemB?.data?.date} — {itemB?.data?.venue}</div>
     </article>
-  </div>
+    </div>
 
-  <div class="actions">
-    <button id="btn-better" aria-label="Better (B)" on:click={() => result('a')}>Better</button>
-    <button id="btn-worse" aria-label="Worse (W)" on:click={() => result('b')}>Worse</button>
-    <button id="btn-equal" aria-label="Equal (E)" on:click={() => result('tie')}>Equal</button>
-    <button id="btn-unsure" aria-label="Unsure (U)" on:click={() => result('unsure')}>Not sure</button>
+    <div class="actions">
+      <button id="btn-better" class="primary" aria-label="Better (B)" on:click={() => result('a')}>Better</button>
+      <button id="btn-worse" class="secondary" aria-label="Worse (W)" on:click={() => result('b')}>Worse</button>
+      <button id="btn-equal" class="secondary" aria-label="Equal (E)" on:click={() => result('tie')}>Equal</button>
+      <button id="btn-unsure" class="secondary" aria-label="Unsure (U)" on:click={() => result('unsure')}>Not sure</button>
+    </div>
   </div>
 </div>
 

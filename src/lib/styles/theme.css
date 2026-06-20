@@ -113,3 +113,28 @@ input:focus { outline: 3px solid rgba(124,58,237,0.08); outline-offset: 2px }
 
 /* Utility */
 .row { display:flex; gap:var(--space-sm); align-items:center }
+
+/* Modal backdrop and animations */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2,6,23,0.45);
+  padding: var(--space-md);
+  z-index: 60;
+  animation: fadeIn 160ms ease-out;
+}
+
+.modal { transform-origin: center; animation: popIn 180ms cubic-bezier(.2,.9,.2,1); }
+
+@keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+@keyframes popIn { from { opacity: 0; transform: translateY(6px) scale(0.985) } to { opacity:1; transform: translateY(0) scale(1) } }
+
+button { transition: transform 120ms ease, box-shadow 120ms ease }
+button:hover { transform: translateY(-1px) }
+
+/* Card refinements */
+.cards { gap: 1rem; display:flex; }
+.card { background: var(--surface); border-radius: 8px; padding: 0.75rem; box-shadow: var(--shadow-sm); border: 1px solid rgba(15,23,42,0.04); width: 220px }
