@@ -30,8 +30,8 @@
       } else {
         // start interactive insertion via findInsertIndex which will call compareFn that shows modal
         pendingNew = id;
-        showCompare = true;
-        // actual insertion logic is handled by compareFn and onResult
+        // run insertion flow
+        await startInsertion();
       }
       showAdd = false;
     }
@@ -48,6 +48,7 @@
       return new Promise((resolve) => {
         // show comparison modal for UI
         comparePair = { newId, otherId, resolve };
+        showCompare = true;
       });
     }
 
@@ -66,8 +67,7 @@
       // resolve the waiting promise
       comparePair.resolve(r === 'a' ? 'a' : r === 'b' ? 'b' : r === 'tie' ? 'tie' : 'unsure');
       comparePair = null;
-      // if the insertion is still in progress, continue
-      // startInsertion will pick up after all comparisons
+      // keep modal visible until insertion completes; insertion flow will set showCompare=false
     }
   </script>
 
@@ -77,7 +77,23 @@
   {/if}
 
   {#if showCompare && comparePair}
-    <ComparisonModal {itemA}={null} {itemB}={null} on:result={onCompareResult} />
+    {#await (async () => { const a = await getItem(comparePair.newId); const b = await getItem(comparePair.otherId); return { a,b } })() then pair}
+      <ComparisonModal itemA={pair.a} itemB={pair.b} on:result={onCompareResult} />
+    {/await}
   {/if}
+
+  <!-- show ranking -->
+  <script lang="ts">
+    import RankedList from '$lib/components/RankedList.svelte';
+    import { getItem } from '$lib/stores/itemsStore';
+    let itemsForDisplay = [];
+    $: (async () => {
+      const ids = await getRanking({ type: 'concert' });
+      const items = await Promise.all((ids||[]).map((id) => getItem(id)));
+      itemsForDisplay = items;
+    })();
+  </script>
+
+  <RankedList items={itemsForDisplay} />
 
 </main>
