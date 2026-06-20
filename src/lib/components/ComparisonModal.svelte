@@ -32,11 +32,11 @@
 
 <div class="modal" role="dialog" aria-modal="true">
   <div class="cards">
-    <article role="article" aria-label="Item A" class="card">
+    <article aria-label="Item A" class="card">
       <div class="title">{itemA?.data?.artist ?? itemA?.id}</div>
       <div class="meta">{itemA?.data?.date} — {itemA?.data?.venue}</div>
     </article>
-    <article role="article" aria-label="Item B" class="card">
+    <article aria-label="Item B" class="card">
       <div class="title">{itemB?.data?.artist ?? itemB?.id}</div>
       <div class="meta">{itemB?.data?.date} — {itemB?.data?.venue}</div>
     </article>

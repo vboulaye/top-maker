@@ -2,21 +2,23 @@
   "name": "top-maker",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "svelte-kit dev",
-    "build": "svelte-kit build",
-    "preview": "svelte-kit preview",
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "vitest"
   },
   "devDependencies": {
+    "@sveltejs/adapter-auto": "latest",
     "@sveltejs/kit": "next",
-    "svelte": "latest",
-    "typescript": "latest",
-    "vitest": "latest",
     "@testing-library/svelte": "latest",
-    "idb": "latest",
     "fake-indexeddb": "latest",
+    "idb": "latest",
+    "svelte": "latest",
     "svelte-preprocess": "latest",
-    "@sveltejs/adapter-auto": "latest"
+    "typescript": "latest",
+    "vite": "^8.0.16",
+    "vitest": "latest"
   }
 }
