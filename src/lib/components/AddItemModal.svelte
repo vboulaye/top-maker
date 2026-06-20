@@ -74,13 +74,15 @@
       }
     }
 
-    // Populate fields and submit as Add Without Ranking
+    // Populate fields and submit as Add Without Ranking (legacy comment)
     artist = parsed.artist || '';
     date = parsed.date || '';
     venue = parsed.venue || '';
     // clear fast entry
     fastEntry = '';
-    addWithout();
+    // use addAndRank (without comparisons) to add and close modal — we no longer have addWithout
+    if (onAddAndRank) onAddAndRank({ artist, date, venue });
+    dispatch('add', { data: { artist, date, venue }, rank: false });
   }
 
   // Live-parse fastEntry so clicking "Add and Rank" uses parsed values
@@ -121,7 +123,7 @@
   <label>Venue<input name="venue" bind:value={venue} /></label>
   <div class="actions">
     <button on:click={addAndRank}>Add and Rank</button>
-    <button on:click={() => { fastEntry = ''; fastError = null; artist = ''; date = ''; venue = ''; dispatch('cancel'); }}>
+    <button class="secondary" on:click={() => { fastEntry = ''; fastError = null; artist = ''; date = ''; venue = ''; dispatch('cancel'); }}>
       Cancel
     </button>
   </div>
