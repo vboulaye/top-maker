@@ -37,6 +37,20 @@ export async function exportJsonFile() {
 export async function importJsonText(json: string) {
   try {
     // "Replace All" import semantics chosen by user
+    // record undo snapshot (full previous snapshot) before replacing
+    try {
+      if (typeof window !== 'undefined') {
+        const { recordUndoSnapshot } = await import('$lib/stores/undoStore');
+        await recordUndoSnapshot('Import snapshot', {
+          items: await exportItems(),
+          rankings: await exportRankings(),
+          comparisons: await exportComparisons()
+        });
+      }
+    } catch (e) {
+      // ignore undo failures
+    }
+
     const snapshot = parseSnapshot(json);
     await replaceItems(snapshot.items);
     await replaceRankings(snapshot.rankings);

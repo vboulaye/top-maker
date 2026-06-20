@@ -3,6 +3,7 @@
   import ComparisonModal from '$lib/components/ComparisonModal.svelte';
   import RankedList from '$lib/components/RankedList.svelte';
   import { storageStatus, exportJsonFile, importJsonText, openFromFileHandle, saveToFileHandle } from '$lib/stores/storageStore';
+  import { lastSnapshot, lastActionLabel, undo } from '$lib/stores/undoStore';
   import { items } from '$lib/stores/itemsStore';
   import { addItem } from '$lib/stores/itemsStore';
   import { rankings, getRanking, insertAt } from '$lib/stores/rankingStore';
@@ -78,6 +79,9 @@
 
   <button on:click={() => (showAdd = true)}>Add</button>
   <button on:click={() => exportJsonFile()}>Export JSON</button>
+  {#if $lastSnapshot}
+    <button on:click={async () => { await undo(); }}>Undo: {$lastActionLabel}</button>
+  {/if}
   <label style="display:inline-block; margin-left:8px;">
     Import JSON
     <input

@@ -21,6 +21,18 @@ if (browser && dbPromise) {
 }
 
 export async function recordComparison(entry: ComparisonEntry) {
+  // record undo snapshot (previous comparisons) before mutating
+  try {
+    if (typeof window !== 'undefined') {
+      const { recordUndoSnapshot } = await import('$lib/stores/undoStore');
+      let current: ComparisonEntry[] = [];
+      comparisons.subscribe((v) => (current = v))();
+      await recordUndoSnapshot(`Comparison recorded`, { comparisons: current });
+    }
+  } catch (e) {
+    // ignore
+  }
+
   if (browser && dbPromise) {
     const db = await dbPromise;
     await db.put('comparisons', entry);

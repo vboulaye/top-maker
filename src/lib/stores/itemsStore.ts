@@ -33,6 +33,18 @@ if (browser && dbPromise) {
 }
 
 export async function addItem(item: Item) {
+  // record undo snapshot (previous items) before mutating
+  try {
+    if (typeof window !== 'undefined') {
+      const { recordUndoSnapshot } = await import('$lib/stores/undoStore');
+      let current: Record<string, Item> = {};
+      items.subscribe((v) => (current = v))();
+      await recordUndoSnapshot(`Added: ${item.data?.artist ?? item.id}`, { items: current });
+    }
+  } catch (e) {
+    // ignore undo recording failures
+  }
+
   if (browser && dbPromise) {
     const db = await dbPromise;
     await db.put('items', item);
