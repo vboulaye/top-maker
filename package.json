@@ -1,0 +1,22 @@
+{
+  "name": "top-maker",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "svelte-kit dev",
+    "build": "svelte-kit build",
+    "preview": "svelte-kit preview",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@sveltejs/kit": "next",
+    "svelte": "latest",
+    "typescript": "latest",
+    "vitest": "latest",
+    "@testing-library/svelte": "latest",
+    "idb": "latest",
+    "fake-indexeddb": "latest",
+    "svelte-preprocess": "latest",
+    "@sveltejs/adapter-auto": "latest"
+  }
+}
