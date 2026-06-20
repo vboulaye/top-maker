@@ -8,7 +8,6 @@
 </div>
 
 <style>
-.item-card { border: 1px solid #eee; padding: 0.5rem; border-radius:4px }
-.title { font-weight: 600 }
-.meta { color: #666; font-size: 0.9rem }
+:global(.item-card) { border: none }
+/* local overrides kept minimal; base styles live in theme.css */
 </style>
