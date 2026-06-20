@@ -1,0 +1,141 @@
+{
+  ".svelte-kit/generated/client-optimized/app.js": {
+    "file": "_app/immutable/entry/app.Cz4gq5mn.js",
+    "name": "entry/app",
+    "src": ".svelte-kit/generated/client-optimized/app.js",
+    "isEntry": true,
+    "imports": [
+      "_DnKN8WAZ.js",
+      "_kNaey6uv.js",
+      "_xihTtKlq.js"
+    ],
+    "dynamicImports": [
+      ".svelte-kit/generated/client-optimized/nodes/0.js",
+      ".svelte-kit/generated/client-optimized/nodes/1.js",
+      ".svelte-kit/generated/client-optimized/nodes/2.js",
+      ".svelte-kit/generated/shared/error-template.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/0.js": {
+    "file": "_app/immutable/nodes/0.BfISoet6.js",
+    "name": "nodes/0",
+    "src": ".svelte-kit/generated/client-optimized/nodes/0.js",
+    "isEntry": true,
+    "imports": [
+      "_DnKN8WAZ.js",
+      "_xihTtKlq.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/1.js": {
+    "file": "_app/immutable/nodes/1.BqzH4Vzf.js",
+    "name": "nodes/1",
+    "src": ".svelte-kit/generated/client-optimized/nodes/1.js",
+    "isEntry": true,
+    "imports": [
+      "_DnKN8WAZ.js",
+      "_Doq7kaok.js",
+      "_xihTtKlq.js"
+    ]
+  },
+  ".svelte-kit/generated/client-optimized/nodes/2.js": {
+    "file": "_app/immutable/nodes/2.BAjZaN4F.js",
+    "name": "nodes/2",
+    "src": ".svelte-kit/generated/client-optimized/nodes/2.js",
+    "isEntry": true,
+    "imports": [
+      "_DnKN8WAZ.js",
+      "_kNaey6uv.js",
+      "_CdbSE3_O.js",
+      "_xihTtKlq.js",
+      "_0mPQTNz6.js"
+    ],
+    "dynamicImports": [
+      ".svelte-kit/generated/client-optimized/nodes/2.js"
+    ],
+    "css": [
+      "_app/immutable/assets/2.CnIkPW91.css"
+    ]
+  },
+  ".svelte-kit/generated/shared/error-template.js": {
+    "file": "_app/immutable/chunks/Bjy-W4x2.js",
+    "name": "error-template",
+    "src": ".svelte-kit/generated/shared/error-template.js",
+    "isDynamicEntry": true
+  },
+  "_0mPQTNz6.js": {
+    "file": "_app/immutable/chunks/0mPQTNz6.js",
+    "name": "index-client",
+    "imports": [
+      "_DnKN8WAZ.js"
+    ]
+  },
+  "_CdbSE3_O.js": {
+    "file": "_app/immutable/chunks/CdbSE3_O.js",
+    "name": "build"
+  },
+  "_DnKN8WAZ.js": {
+    "file": "_app/immutable/chunks/DnKN8WAZ.js",
+    "name": "index-client"
+  },
+  "_Doq7kaok.js": {
+    "file": "_app/immutable/chunks/Doq7kaok.js",
+    "name": "client",
+    "imports": [
+      "_DnKN8WAZ.js",
+      "_0mPQTNz6.js"
+    ]
+  },
+  "_kNaey6uv.js": {
+    "file": "_app/immutable/chunks/kNaey6uv.js",
+    "name": "preload-helper"
+  },
+  "_xihTtKlq.js": {
+    "file": "_app/immutable/chunks/xihTtKlq.js",
+    "name": "disclose-version"
+  },
+  "node_modules/@sveltejs/kit/src/runtime/client/entry.js": {
+    "file": "_app/immutable/entry/start.1UfyWTQO.js",
+    "name": "entry/start",
+    "src": "node_modules/@sveltejs/kit/src/runtime/client/entry.js",
+    "isEntry": true,
+    "imports": [
+      "_Doq7kaok.js"
+    ]
+  },
+  "src/lib/stores/comparisonsStore.ts": {
+    "file": "_app/immutable/chunks/Msa2jxyS.js",
+    "name": "comparisonsStore",
+    "src": "src/lib/stores/comparisonsStore.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      ".svelte-kit/generated/client-optimized/nodes/2.js"
+    ]
+  },
+  "src/lib/stores/itemsStore.ts": {
+    "file": "_app/immutable/chunks/BfYwLA5I.js",
+    "name": "itemsStore",
+    "src": "src/lib/stores/itemsStore.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      ".svelte-kit/generated/client-optimized/nodes/2.js"
+    ]
+  },
+  "src/lib/stores/rankingStore.ts": {
+    "file": "_app/immutable/chunks/yrBT6miX.js",
+    "name": "rankingStore",
+    "src": "src/lib/stores/rankingStore.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      ".svelte-kit/generated/client-optimized/nodes/2.js"
+    ]
+  },
+  "src/lib/stores/undoStore.ts": {
+    "file": "_app/immutable/chunks/CGIaXdkr.js",
+    "name": "undoStore",
+    "src": "src/lib/stores/undoStore.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      ".svelte-kit/generated/client-optimized/nodes/2.js"
+    ]
+  }
+}

@@ -1,0 +1,236 @@
+{
+  ".svelte-kit/generated/server/internal.js": {
+    "file": "internal.js",
+    "name": "internal",
+    "src": ".svelte-kit/generated/server/internal.js",
+    "isEntry": true,
+    "imports": [
+      "_internal2.js",
+      "_internal.js"
+    ]
+  },
+  "_comparisonsStore2.js": {
+    "file": "chunks/comparisonsStore2.js",
+    "name": "comparisonsStore",
+    "imports": [
+      "_shared2.js",
+      "_index-server2.js"
+    ],
+    "dynamicImports": [
+      "_undoStore2.js"
+    ]
+  },
+  "_env.js": {
+    "file": "chunks/env.js",
+    "name": "env"
+  },
+  "_exports.js": {
+    "file": "chunks/exports.js",
+    "name": "exports"
+  },
+  "_index-server.js": {
+    "file": "chunks/index-server.js",
+    "name": "index-server",
+    "imports": [
+      "_shared2.js",
+      "_server.js"
+    ]
+  },
+  "_index-server2.js": {
+    "file": "chunks/index-server2.js",
+    "name": "index-server",
+    "imports": [
+      "_shared2.js"
+    ]
+  },
+  "_internal.js": {
+    "file": "chunks/internal.js",
+    "name": "internal"
+  },
+  "_internal2.js": {
+    "file": "chunks/internal2.js",
+    "name": "internal",
+    "imports": [
+      "_index-server.js",
+      "_internal.js",
+      "_shared2.js",
+      "_server.js"
+    ]
+  },
+  "_itemsStore2.js": {
+    "file": "chunks/itemsStore2.js",
+    "name": "itemsStore",
+    "imports": [
+      "_shared2.js",
+      "_index-server2.js"
+    ],
+    "dynamicImports": [
+      "_undoStore2.js"
+    ]
+  },
+  "_rankingStore2.js": {
+    "file": "chunks/rankingStore2.js",
+    "name": "rankingStore",
+    "imports": [
+      "_shared2.js",
+      "_index-server2.js"
+    ],
+    "dynamicImports": [
+      "_undoStore2.js"
+    ]
+  },
+  "_server.js": {
+    "file": "chunks/server.js",
+    "name": "server",
+    "imports": [
+      "_shared2.js"
+    ]
+  },
+  "_shared.js": {
+    "file": "chunks/shared.js",
+    "name": "shared"
+  },
+  "_shared2.js": {
+    "file": "chunks/shared2.js",
+    "name": "shared"
+  },
+  "_undoStore2.js": {
+    "file": "chunks/undoStore2.js",
+    "name": "undoStore",
+    "imports": [
+      "_shared2.js",
+      "_index-server2.js"
+    ],
+    "dynamicImports": [
+      "_itemsStore2.js",
+      "_rankingStore2.js",
+      "_comparisonsStore2.js"
+    ]
+  },
+  "_utils.js": {
+    "file": "chunks/utils.js",
+    "name": "utils",
+    "imports": [
+      "_shared.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js": {
+    "file": "remote-entry.js",
+    "name": "remote-entry",
+    "src": "node_modules/@sveltejs/kit/src/runtime/app/server/remote/index.js",
+    "isEntry": true,
+    "imports": [
+      "_utils.js",
+      "_internal.js",
+      "_shared.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte": {
+    "file": "entries/fallbacks/error.svelte.js",
+    "name": "entries/fallbacks/error.svelte",
+    "src": "node_modules/@sveltejs/kit/src/runtime/components/svelte-5/error.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_internal2.js",
+      "_internal.js",
+      "_exports.js",
+      "_shared.js",
+      "_shared2.js",
+      "_server.js",
+      "_index-server2.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/components/svelte-5/layout.svelte": {
+    "file": "entries/fallbacks/layout.svelte.js",
+    "name": "entries/fallbacks/layout.svelte",
+    "src": "node_modules/@sveltejs/kit/src/runtime/components/svelte-5/layout.svelte",
+    "isEntry": true,
+    "imports": [
+      "_server.js"
+    ]
+  },
+  "node_modules/@sveltejs/kit/src/runtime/server/index.js": {
+    "file": "index.js",
+    "name": "index",
+    "src": "node_modules/@sveltejs/kit/src/runtime/server/index.js",
+    "isEntry": true,
+    "imports": [
+      "_env.js",
+      "_internal2.js",
+      "_utils.js",
+      "_internal.js",
+      "_exports.js",
+      "_shared.js",
+      "_shared2.js",
+      "_index-server2.js"
+    ]
+  },
+  "src/lib/stores/comparisonsStore.ts": {
+    "file": "chunks/comparisonsStore.js",
+    "name": "comparisonsStore",
+    "src": "src/lib/stores/comparisonsStore.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_comparisonsStore2.js"
+    ]
+  },
+  "src/lib/stores/itemsStore.ts": {
+    "file": "chunks/itemsStore.js",
+    "name": "itemsStore",
+    "src": "src/lib/stores/itemsStore.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_itemsStore2.js"
+    ]
+  },
+  "src/lib/stores/rankingStore.ts": {
+    "file": "chunks/rankingStore.js",
+    "name": "rankingStore",
+    "src": "src/lib/stores/rankingStore.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_rankingStore2.js"
+    ]
+  },
+  "src/lib/stores/undoStore.ts": {
+    "file": "chunks/undoStore.js",
+    "name": "undoStore",
+    "src": "src/lib/stores/undoStore.ts",
+    "isDynamicEntry": true,
+    "imports": [
+      "_undoStore2.js"
+    ]
+  },
+  "src/routes/+page.svelte": {
+    "file": "entries/pages/_page.svelte.js",
+    "name": "entries/pages/_page.svelte",
+    "src": "src/routes/+page.svelte",
+    "isEntry": true,
+    "imports": [
+      "_index-server.js",
+      "_shared2.js",
+      "_server.js",
+      "_index-server2.js",
+      "_comparisonsStore2.js",
+      "_itemsStore2.js",
+      "_rankingStore2.js",
+      "_undoStore2.js"
+    ],
+    "dynamicImports": [
+      "_undoStore2.js"
+    ],
+    "css": [
+      "_app/immutable/assets/_page.gsyNyrHl.css"
+    ]
+  },
+  "virtual:__sveltekit/env": {
+    "file": "env.js",
+    "name": "env",
+    "src": "virtual:__sveltekit/env",
+    "isEntry": true,
+    "imports": [
+      "_env.js"
+    ]
+  }
+}
