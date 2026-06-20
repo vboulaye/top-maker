@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { addItem, getItem, listItems } from '../../src/stores/itemsStore';
+import { addItem, getItem, listItems } from '../itemsStore';
 
 describe('itemsStore', () => {
   it('adds and retrieves an item', async () => {
