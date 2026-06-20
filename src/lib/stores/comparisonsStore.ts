@@ -1,3 +1,4 @@
+
 import { openDB } from 'idb';
 import type { ComparisonEntry } from '$lib/types';
 
