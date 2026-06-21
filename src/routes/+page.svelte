@@ -76,6 +76,7 @@
       const target = e.target as Node | null;
       if (!showActionsMenu) return;
       if (actionsEl && actionsToggleEl) {
+        // if the click is outside the menu and toggle, close
         if (actionsEl.contains(target) || actionsToggleEl.contains(target)) return;
         showActionsMenu = false;
       }
@@ -132,7 +133,7 @@
       <p>Track and compare your best concerts of the year.</p>
     </div>
     <div class="top-actions">
-      <button bind:this={actionsToggleEl} class="actions-toggle" aria-expanded={showActionsMenu} on:click={() => (showActionsMenu = !showActionsMenu)}>
+      <button bind:this={actionsToggleEl} class="actions-toggle" aria-expanded={showActionsMenu} on:click|stopPropagation={() => (showActionsMenu = !showActionsMenu)}>
         ☰ Actions
       </button>
     </div>
