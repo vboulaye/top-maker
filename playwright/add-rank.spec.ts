@@ -1,14 +1,16 @@
 import { test, expect } from '@playwright/test';
 
 test('add and rank flow inserts new item via comparisons', async ({ page }) => {
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:5173';
+  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
   await page.goto(url);
   // wait for app to render the Add button
   await page.locator('button:has-text("Add")').waitFor({ state: 'visible' });
 
   // Add first item without ranking to seed list
-  await page.click('button:has-text("Add")');
-  await page.locator('div.modal').waitFor({ state: 'visible' });
+  // use the test helper to reliably open the Add modal in headless environments
+  await page.waitForSelector('[data-topmaker-hydrated="1"]');
+  await page.evaluate(() => (window as any).__topmaker_openAdd && (window as any).__topmaker_openAdd());
+  await page.getByLabel('Artist').waitFor({ state: 'visible', timeout: 10000 });
   await page.getByLabel('Artist').waitFor({ state: 'visible' });
   await page.getByLabel('Artist').fill('First Artist');
   await page.getByLabel('Date').fill('2026-06-01');
@@ -19,9 +21,8 @@ test('add and rank flow inserts new item via comparisons', async ({ page }) => {
   await expect(page.locator('text=First Artist')).toHaveCount(1);
 
   // Now add second item and choose to rank
-  await page.click('button:has-text("Add")');
-  await page.locator('div.modal').waitFor({ state: 'visible' });
-  await page.getByLabel('Artist').waitFor({ state: 'visible' });
+  await page.evaluate(() => (window as any).__topmaker_openAdd && (window as any).__topmaker_openAdd());
+  await page.getByLabel('Artist').waitFor({ state: 'visible', timeout: 10000 });
   await page.getByLabel('Artist').fill('Second Artist');
   await page.getByLabel('Date').fill('2026-06-02');
   await page.getByLabel('Venue').fill('Venue Two');

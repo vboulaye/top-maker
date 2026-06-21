@@ -27,6 +27,6 @@ jobs:
       - name: Preview site
         run: npm run preview &
       - name: Wait for preview
-        run: npx wait-on http://localhost:5173
+        run: npx wait-on http://localhost:4173
       - name: Run Playwright tests
         run: npx playwright test --config=playwright.config.ts

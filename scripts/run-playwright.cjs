@@ -2,7 +2,7 @@
 const { spawn } = require('child_process');
 const http = require('http');
 
-const PREVIEW_PORT = process.env.PREVIEW_PORT || 5173;
+const PREVIEW_PORT = process.env.PREVIEW_PORT || 4173;
 const PREVIEW_URL = `http://localhost:${PREVIEW_PORT}/`;
 const START_TIMEOUT = parseInt(process.env.START_TIMEOUT || '30000', 10);
 

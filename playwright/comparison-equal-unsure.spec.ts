@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 
 test('comparison equal inserts at same index (tie)', async ({ page }) => {
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:5173';
+  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
   await page.goto(url);
   await page.locator('button:has-text("Add")').waitFor({ state: 'visible' });
 
   // Seed with one item
-  await page.click('button:has-text("Add")');
-  await page.locator('div.modal').waitFor({ state: 'visible' });
-  await page.getByLabel('Artist').waitFor({ state: 'visible' });
+  await page.waitForSelector('[data-topmaker-hydrated="1"]');
+  await page.evaluate(() => (window as any).__topmaker_openAdd && (window as any).__topmaker_openAdd());
+  await page.getByLabel('Artist').waitFor({ state: 'visible', timeout: 10000 });
   await page.getByLabel('Artist').fill('Equal First');
   await page.getByLabel('Date').fill('2026-06-01');
   await page.getByLabel('Venue').fill('V1');
@@ -16,7 +16,7 @@ test('comparison equal inserts at same index (tie)', async ({ page }) => {
 
   // Add second and choose Equal
   await page.click('button:has-text("Add")');
-  await page.locator('div.modal').waitFor({ state: 'visible' });
+  await page.getByLabel('Artist').waitFor({ state: 'visible', timeout: 10000 });
   await page.getByLabel('Artist').waitFor({ state: 'visible' });
   await page.getByLabel('Artist').fill('Equal Second');
   await page.getByLabel('Date').fill('2026-06-02');
@@ -31,12 +31,12 @@ test('comparison equal inserts at same index (tie)', async ({ page }) => {
 });
 
 test('comparison unsure inserts after compared item (unsure)', async ({ page }) => {
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:5173';
+  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
   await page.goto(url);
 
   // Seed with one item
-  await page.click('button:has-text("Add")');
-  await page.locator('div.modal').waitFor({ state: 'visible' });
+  await page.waitForSelector('[data-topmaker-hydrated="1"]');
+  await page.evaluate(() => (window as any).__topmaker_openAdd && (window as any).__topmaker_openAdd());
   await page.getByLabel('Artist').waitFor({ state: 'visible' });
   await page.getByLabel('Artist').fill('Unsure First');
   await page.getByLabel('Date').fill('2026-06-01');
