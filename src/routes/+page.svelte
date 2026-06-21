@@ -176,7 +176,7 @@
       </button>
 
       {#if showActionsMenu}
-        <div bind:this={actionsEl} class="actions-menu" role="menu" tabindex="0" on:click|stopPropagation>
+        <div bind:this={actionsEl} class="actions-menu" role="menu" tabindex="0" on:click|stopPropagation on:keydown|stopPropagation={(e) => e.stopPropagation()}>
           <button data-test="actions-export" role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
           <!-- use a button to open the file picker for accessibility; trigger hidden input click -->
           <button
@@ -194,7 +194,7 @@
             <button role="menuitem" on:click={() => { openFromFileHandle(); showActionsMenu = false }} class="secondary">Open File</button>
             <button role="menuitem" on:click={() => { saveToFileHandle(); showActionsMenu = false }} class="secondary">Save File</button>
           {/if}
-          <div class="menu-sep" />
+          <div class="menu-sep"></div>
           <button role="menuitem" on:click={() => { toggleTheme(); showActionsMenu = false }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
         </div>
       {/if}
