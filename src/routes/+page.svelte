@@ -2,7 +2,7 @@
   import AddItemModal from '$lib/components/AddItemModal.svelte';
   import ComparisonModal from '$lib/components/ComparisonModal.svelte';
   import RankedList from '$lib/components/RankedList.svelte';
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { storageStatus, exportJsonFile, importJsonText, openFromFileHandle, saveToFileHandle } from '$lib/stores/storageStore';
   // undo feature removed
   import { items } from '$lib/stores/itemsStore';
@@ -14,6 +14,8 @@
   let theme: 'light' | 'dark' = 'light';
   let showCompare = false;
   let showMobileActions = false;
+  let mobileActionsEl: HTMLElement | null = null;
+  let mobileToggleEl: HTMLElement | null = null;
   let pendingNew: string | null = null;
   let comparePair: { newId: string; otherId: string; resolve: (value: 'a' | 'b' | 'tie' | 'unsure') => void } | null = null;
   let currentRanking: string[] = [];
@@ -69,6 +71,17 @@
     } else {
       applyTheme('light');
     }
+    // click-outside handler for mobile actions
+    const onDoc = (e: MouseEvent) => {
+      const target = e.target as Node | null;
+      if (!showMobileActions) return;
+      if (mobileActionsEl && mobileToggleEl) {
+        if (mobileActionsEl.contains(target) || mobileToggleEl.contains(target)) return;
+        showMobileActions = false;
+      }
+    };
+    window.addEventListener('click', onDoc);
+    onDestroy(() => window.removeEventListener('click', onDoc));
   });
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {
@@ -153,13 +166,13 @@
           <span>Save</span>
         </button>
       {/if}
-      <button class="mobile-toggle" aria-expanded={showMobileActions} on:click={() => (showMobileActions = !showMobileActions)}>
+      <button bind:this={mobileToggleEl} class="mobile-toggle" aria-expanded={showMobileActions} on:click={() => (showMobileActions = !showMobileActions)}>
         ☰
       </button>
     </div>
 
     {#if showMobileActions}
-      <div class="mobile-actions" role="menu">
+      <div bind:this={mobileActionsEl} class="mobile-actions" role="menu">
         <button role="menuitem" on:click={() => { exportJsonFile(); showMobileActions = false }} class="secondary">Export</button>
         <label class="file-button" role="menuitem">
           Import
