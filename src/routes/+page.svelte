@@ -89,24 +89,8 @@
     };
     window.addEventListener('click', onDoc);
     window.addEventListener('keydown', onKeyDown);
-    // ensure toggle works even if Svelte event modifiers don't behave in some environments
-    const toggleHandler = (ev: Event) => {
-      ev.stopPropagation();
-      showActionsMenu = !showActionsMenu;
-    };
-    if (actionsToggleEl) actionsToggleEl.addEventListener('click', toggleHandler);
-    // mirror state to <body> attribute to help with some browser style ordering
-    const reflect = () => {
-      try { document.body.setAttribute('data-actions-open', showActionsMenu ? 'true' : 'false'); } catch (e) {}
-    };
-    const obs = new MutationObserver(reflect);
-    obs.observe(document.body, { attributes: true });
-    // update on mutation loop
-    const interval = setInterval(reflect, 50);
     onDestroy(() => window.removeEventListener('click', onDoc));
     onDestroy(() => window.removeEventListener('keydown', onKeyDown));
-    onDestroy(() => { if (actionsToggleEl) actionsToggleEl.removeEventListener('click', toggleHandler); });
-    onDestroy(() => { obs.disconnect(); clearInterval(interval); });
   });
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {
@@ -151,47 +135,46 @@
     <div class="top-actions">
       <button
         bind:this={actionsToggleEl}
-        class="actions-toggle"
+        class="actions-toggle secondary"
         aria-expanded={showActionsMenu}
         aria-pressed={showActionsMenu}
-        on:click|stopPropagation={() => { console.log('actions toggle click', showActionsMenu); showActionsMenu = !showActionsMenu }}
+        on:click|stopPropagation={() => { showActionsMenu = !showActionsMenu }}
         on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showActionsMenu = !showActionsMenu } }}
       >
         ☰ Actions
       </button>
-    </div>
 
-    {#if showActionsMenu}
-      <div bind:this={actionsEl} class="actions-menu" role="menu" on:click|stopPropagation>
-        <button role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
-        <label class="file-button" role="menuitem">
-          Import
-          <input
-            type="file"
-            accept="application/json"
-            on:change={async (e) => {
-              const f = e.target.files && e.target.files[0];
-              if (!f) return;
-              const text = await f.text();
-              await importJsonText(text);
-              showActionsMenu = false;
-            }}
-          />
-        </label>
-        {#if $storageStatus.canUseFileSystemApi}
-          <button role="menuitem" on:click={() => { openFromFileHandle(); showActionsMenu = false }} class="secondary">Open File</button>
-          <button role="menuitem" on:click={() => { saveToFileHandle(); showActionsMenu = false }} class="secondary">Save File</button>
-        {/if}
-        <div class="menu-sep" />
-        <button role="menuitem" on:click={() => { toggleTheme(); showActionsMenu = false }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
-      </div>
-    {/if}
+      {#if showActionsMenu}
+        <div bind:this={actionsEl} class="actions-menu" role="menu" on:click|stopPropagation>
+          <button role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
+          <label class="file-button" role="menuitem">
+            Import
+            <input
+              type="file"
+              accept="application/json"
+              on:change={async (e) => {
+                const f = e.target.files && e.target.files[0];
+                if (!f) return;
+                const text = await f.text();
+                await importJsonText(text);
+                showActionsMenu = false;
+              }}
+            />
+          </label>
+          {#if $storageStatus.canUseFileSystemApi}
+            <button role="menuitem" on:click={() => { openFromFileHandle(); showActionsMenu = false }} class="secondary">Open File</button>
+            <button role="menuitem" on:click={() => { saveToFileHandle(); showActionsMenu = false }} class="secondary">Save File</button>
+          {/if}
+          <div class="menu-sep" />
+          <button role="menuitem" on:click={() => { toggleTheme(); showActionsMenu = false }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
+        </div>
+      {/if}
+    </div>
   </div>
 
   <div class="controls">
     <button on:click={() => (showAdd = true)} class="primary">Add</button>
     <div class="spacer"></div>
-    <button on:click={toggleTheme} class="secondary">{theme === 'dark' ? 'Light' : 'Dark'}</button>
   </div>
 
   {#if showAdd}
