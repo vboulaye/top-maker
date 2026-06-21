@@ -100,6 +100,10 @@
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       window.__topmaker_openAdd = () => { showAdd = true; };
+      // expose helper to open actions menu for tests
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      window.__topmaker_openActions = () => { showActionsMenu = true; };
       // expose an export helper so tests can obtain exported JSON without relying on downloads
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
