@@ -1,10 +1,21 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
+  import AddItemModal from './AddItemModal.svelte';
   export let item: any;
+  export let editing: boolean = false;
   const dispatch = createEventDispatcher();
 
   function onEdit() {
     dispatch('edit', { id: item.id, data: item.data });
+  }
+
+  function onSave(e) {
+    // e.detail should contain { data }
+    dispatch('update', { id: item.id, data: e.detail.data });
+  }
+
+  function onCancelEdit() {
+    dispatch('cancel-edit');
   }
 </script>
 
@@ -19,7 +30,12 @@
       </svg>
     </button>
   </div>
-  <div class="meta">{item?.data?.date} — {item?.data?.venue}</div>
+  {#if !editing}
+    <div class="meta">{item?.data?.date} — {item?.data?.venue}</div>
+  {:else}
+    <!-- Inline edit: render AddItemModal in edit mode replacing the card -->
+    <AddItemModal initial={item.data} mode="edit" inline={true} on:update={onSave} on:cancel={onCancelEdit} />
+  {/if}
 </div>
 
 <style>

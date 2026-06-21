@@ -2,11 +2,20 @@
   import ItemCard from './ItemCard.svelte';
   import { createEventDispatcher } from 'svelte';
   export let items: any[] = []; // array of item objects
+  export let editingId: string | null = null;
   const dispatch = createEventDispatcher();
 
   function onEdit(ev: CustomEvent) {
     // forward edit events from ItemCard
     dispatch('edit', ev.detail);
+  }
+
+  function onUpdate(ev: CustomEvent) {
+    dispatch('update', ev.detail);
+  }
+
+  function onCancel(ev: CustomEvent) {
+    dispatch('cancel-edit');
   }
 </script>
 
@@ -14,7 +23,7 @@
   {#each items as item, i}
     <div class="rank-row">
       <div class="pos">#{i+1}</div>
-      <div class="row-content"><ItemCard {item} on:edit={onEdit} /></div>
+      <div class="row-content"><ItemCard {item} editing={item.id === editingId} on:edit={onEdit} on:update={onUpdate} on:cancel-edit={onCancel} /></div>
     </div>
   {/each}
 </div>

@@ -112,9 +112,12 @@
     date = initial.date || '';
     venue = initial.venue || '';
   }
+
+  // ensure that when used inline (not as backdrop modal) the container stretches
+  export let inline: boolean = false;
 </script>
 
-  <div class="modal">
+<div class="modal" style={inline ? 'box-shadow:none; padding:0; background:transparent' : ''}>
   {#if mode === 'add'}
   <label>Fast entry
     <input

@@ -225,16 +225,12 @@
     showActionsMenu = false;
   }} />
 
-  {#if showAdd}
+  {#if showAdd && !editingItem}
     <AddItemModal
-      initial={editingItem ? editingItem.data : null}
-      mode={editingItem ? 'edit' : 'add'}
+      initial={null}
+      mode={'add'}
       on:add={(ev) => (ev.detail.rank ? onAddAndRank(ev.detail.data) : onAddWithoutRanking(ev.detail.data))}
-      on:update={async (ev) => {
-        if (!editingItem) return;
-        await onUpdateItem(editingItem.id, ev.detail.data);
-      }}
-      on:cancel={() => { editingItem = null; showAdd = false }}
+      on:cancel={() => { showAdd = false }}
     />
   {/if}
 
@@ -246,7 +242,16 @@
     />
   {/if}
 
-  <RankedList items={itemsForDisplay} on:edit={(e) => { editingItem = { id: e.detail.id, data: e.detail.data }; showAdd = true }} />
+  <RankedList
+    items={itemsForDisplay}
+    editingId={editingItem ? editingItem.id : null}
+    on:edit={(e) => { editingItem = { id: e.detail.id, data: e.detail.data }; }}
+    on:update={async (e) => {
+      // e.detail: { id, data }
+      await onUpdateItem(e.detail.id, e.detail.data);
+    }}
+    on:cancel-edit={() => { editingItem = null }}
+  />
   {#if $storageStatus.lastAction}
     <div class="storage-status">{$storageStatus.lastAction}</div>
   {/if}
