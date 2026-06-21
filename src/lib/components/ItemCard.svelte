@@ -21,6 +21,8 @@
 
   function handleCardClick(e: MouseEvent) {
     // don't open edit if click was on controls (like the edit button) — those use stopPropagation
+    // also ignore clicks when already editing to allow inner inputs to receive focus
+    if (editing) return;
     dispatch('edit', { id: item.id, data: item.data });
   }
 </script>
@@ -71,6 +73,7 @@
   color: var(--accent, #1a73e8);
   outline: none;
 }
+.item-card:hover { background: color-mix(in srgb, var(--surface) 85%, black 3%); cursor: pointer }
 .edit-button:focus-visible { box-shadow: 0 0 0 3px rgba(26,115,232,0.12); }
 
 /* Mobile: stack header so button remains visible and accessible */
