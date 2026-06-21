@@ -110,9 +110,20 @@
       <p>Track and compare your best concerts of the year.</p>
     </div>
     <div class="top-actions">
-      <button on:click={() => exportJsonFile()} class="secondary">Export JSON</button>
+      <button on:click={() => exportJsonFile()} class="secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 21H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Export</span>
+      </button>
       <label class="file-button">
-        Import
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 21V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 15l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span>Import</span>
         <input
           type="file"
           accept="application/json"
@@ -125,8 +136,21 @@
         />
       </label>
       {#if $storageStatus.canUseFileSystemApi}
-        <button on:click={() => openFromFileHandle()} class="secondary">Open File</button>
-        <button on:click={() => saveToFileHandle()} class="secondary">Save File</button>
+        <button on:click={() => openFromFileHandle()} class="secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 10l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Open</span>
+        </button>
+        <button on:click={() => saveToFileHandle()} class="secondary">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
+            <path d="M21 15V5a2 2 0 0 0-2-2H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M7 21h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M17 21v-8H7v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Save</span>
+        </button>
       {/if}
     </div>
   </div>

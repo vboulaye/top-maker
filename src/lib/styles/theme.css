@@ -63,6 +63,15 @@ p { margin-top: 0.25rem; color: var(--muted) }
 .top-actions { display:flex; gap:0.5rem; align-items:center }
 .file-button { display:inline-flex; align-items:center; padding:0.45rem 0.6rem; border-radius:6px; border:1px solid rgba(15,23,42,0.06); background:transparent; cursor:pointer }
 .file-button input { display:none }
+.top-actions button, .file-button { display:inline-flex; gap:0.5rem; align-items:center; padding:0.45rem 0.6rem; border-radius:6px }
+.top-actions button svg { opacity:0.9 }
+.top-actions button span, .file-button span { font-weight:600 }
+.top-actions button.secondary { border:1px solid rgba(15,23,42,0.06); background:transparent }
+.top-actions button.primary { background: linear-gradient(180deg, var(--accent), color-mix(in srgb, var(--accent) 85%, black 5%)); color:var(--accent-contrast) }
+
+@media (max-width: 680px) {
+  .top-actions { display:none }
+}
 
 /* Buttons */
 button {
