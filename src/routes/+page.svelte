@@ -89,8 +89,15 @@
     };
     window.addEventListener('click', onDoc);
     window.addEventListener('keydown', onKeyDown);
+    // ensure toggle works even if Svelte event modifiers don't behave in some environments
+    const toggleHandler = (ev: Event) => {
+      ev.stopPropagation();
+      showActionsMenu = !showActionsMenu;
+    };
+    if (actionsToggleEl) actionsToggleEl.addEventListener('click', toggleHandler);
     onDestroy(() => window.removeEventListener('click', onDoc));
     onDestroy(() => window.removeEventListener('keydown', onKeyDown));
+    onDestroy(() => { if (actionsToggleEl) actionsToggleEl.removeEventListener('click', toggleHandler); });
   });
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {
