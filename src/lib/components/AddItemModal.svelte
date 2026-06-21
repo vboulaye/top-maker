@@ -128,7 +128,15 @@
   }
 </script>
 
-<div class="modal" style={inline ? 'box-shadow:none; padding:0; background:transparent' : ''} on:click={(e) => { if (inline) e.stopPropagation(); }} on:keydown={(e) => { if (inline && e.key === 'Escape') { e.stopPropagation(); dispatch('cancel'); } }}>
+<div
+  class="modal"
+  style={inline ? 'box-shadow:none; padding:0; background:transparent' : ''}
+  role={inline ? 'region' : 'dialog'}
+  aria-label={inline ? `Edit ${initial?.artist ?? 'item'}` : undefined}
+  aria-modal={inline ? undefined : 'true'}
+  on:click={(e) => { if (inline) e.stopPropagation(); }}
+  on:keydown={(e) => { if (inline && e.key === 'Escape') { e.stopPropagation(); dispatch('cancel'); } }}
+>
   {#if mode === 'add'}
   <label>Fast entry
     <input
