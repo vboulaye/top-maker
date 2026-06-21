@@ -104,34 +104,38 @@
 </script>
 
 <main>
-  <h1>Top Maker</h1>
-  <p>Track and compare your best concerts of the year.</p>
+  <div class="header-row">
+    <div class="title-block">
+      <h1>Top Maker</h1>
+      <p>Track and compare your best concerts of the year.</p>
+    </div>
+    <div class="top-actions">
+      <button on:click={() => exportJsonFile()} class="secondary">Export JSON</button>
+      <label class="file-button">
+        Import
+        <input
+          type="file"
+          accept="application/json"
+          on:change={async (e) => {
+            const f = e.target.files && e.target.files[0];
+            if (!f) return;
+            const text = await f.text();
+            await importJsonText(text);
+          }}
+        />
+      </label>
+      {#if $storageStatus.canUseFileSystemApi}
+        <button on:click={() => openFromFileHandle()} class="secondary">Open File</button>
+        <button on:click={() => saveToFileHandle()} class="secondary">Save File</button>
+      {/if}
+    </div>
+  </div>
 
   <div class="controls">
     <button on:click={() => (showAdd = true)} class="primary">Add</button>
     <div class="spacer"></div>
     <button on:click={toggleTheme} class="secondary">{theme === 'dark' ? 'Light' : 'Dark'}</button>
   </div>
-  <button on:click={() => exportJsonFile()}>Export JSON</button>
-  <!-- Undo button removed -->
-  <label style="display:inline-block; margin-left:8px;">
-    Import JSON
-    <input
-      type="file"
-      accept="application/json"
-      on:change={async (e) => {
-        const f = e.target.files && e.target.files[0];
-        if (!f) return;
-        const text = await f.text();
-        await importJsonText(text);
-      }}
-    />
-  </label>
-
-  {#if $storageStatus.canUseFileSystemApi}
-    <button on:click={() => openFromFileHandle()}>Open File</button>
-    <button on:click={() => saveToFileHandle()}>Save File</button>
-  {/if}
 
   {#if showAdd}
     <AddItemModal
