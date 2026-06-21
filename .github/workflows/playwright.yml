@@ -26,7 +26,11 @@ jobs:
         run: npm run build
       - name: Preview site
         run: npm run preview &
+        env:
+          VITE_E2E: '1'
       - name: Wait for preview
         run: npx wait-on http://localhost:4173
       - name: Run Playwright tests
         run: npx playwright test --config=playwright.config.ts
+        env:
+          VITE_E2E: '1'
