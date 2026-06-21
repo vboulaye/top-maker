@@ -92,6 +92,15 @@
     window.addEventListener('keydown', onKeyDown);
     onDestroy(() => window.removeEventListener('click', onDoc));
     onDestroy(() => window.removeEventListener('keydown', onKeyDown));
+    // expose a small test helper and mark that client has mounted so tests can wait for hydration
+    try {
+      document.documentElement.setAttribute('data-topmaker-hydrated', '1');
+      // allow tests to programmatically open the Add modal if clicks are unreliable in headless environments
+      // (useful only for automated tests)
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      window.__topmaker_openAdd = () => { showAdd = true; };
+    } catch (e) {}
   });
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {
