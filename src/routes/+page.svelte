@@ -2,6 +2,7 @@
   import AddItemModal from '$lib/components/AddItemModal.svelte';
   import ComparisonModal from '$lib/components/ComparisonModal.svelte';
   import RankedList from '$lib/components/RankedList.svelte';
+  import { onMount } from 'svelte';
   import { storageStatus, exportJsonFile, importJsonText, openFromFileHandle, saveToFileHandle } from '$lib/stores/storageStore';
   // undo feature removed
   import { items } from '$lib/stores/itemsStore';
@@ -10,6 +11,7 @@
   import { findInsertIndex } from '$lib/ranking/insertion.js';
 
   let showAdd = false;
+  let theme: 'light' | 'dark' = 'light';
   let showCompare = false;
   let pendingNew: string | null = null;
   let comparePair: { newId: string; otherId: string; resolve: (value: 'a' | 'b' | 'tie' | 'unsure') => void } | null = null;
@@ -39,6 +41,34 @@
 
     showAdd = false;
   }
+
+  function applyTheme(t: 'light' | 'dark') {
+    if (typeof document === 'undefined') return;
+    if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+    else document.documentElement.removeAttribute('data-theme');
+    theme = t;
+    try { localStorage.setItem('theme', t); } catch (e) {}
+  }
+
+  function toggleTheme() {
+    applyTheme(theme === 'dark' ? 'light' : 'dark');
+  }
+
+  onMount(() => {
+    try {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'dark' || stored === 'light') {
+        applyTheme(stored as 'light' | 'dark');
+        return;
+      }
+    } catch (e) {}
+    // default to system preference
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      applyTheme('dark');
+    } else {
+      applyTheme('light');
+    }
+  });
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {
     const id = `i_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
@@ -77,7 +107,11 @@
   <h1>Top Maker</h1>
   <p>Track and compare your best concerts of the year.</p>
 
-  <button on:click={() => (showAdd = true)}>Add</button>
+  <div class="controls">
+    <button on:click={() => (showAdd = true)} class="primary">Add</button>
+    <div class="spacer"></div>
+    <button on:click={toggleTheme} class="secondary">{theme === 'dark' ? 'Light' : 'Dark'}</button>
+  </div>
   <button on:click={() => exportJsonFile()}>Export JSON</button>
   <!-- Undo button removed -->
   <label style="display:inline-block; margin-left:8px;">
