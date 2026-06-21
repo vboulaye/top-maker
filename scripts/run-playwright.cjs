@@ -22,6 +22,8 @@ function waitFor(url, timeout) {
 
 async function main() {
   console.log(`Starting preview server on port ${PREVIEW_PORT}...`);
+  // export a Vite-friendly env so the client can detect e2e mode at runtime
+  try { process.env.VITE_E2E = '1'; } catch (e) {}
   // export the chosen port so spawned Playwright runner can read it via process.env.PREVIEW_PORT
   try { process.env.PREVIEW_PORT = String(PREVIEW_PORT); } catch (e) {}
   // spawn vite preview directly via npx so the child process is the server and is killable

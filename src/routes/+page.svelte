@@ -95,8 +95,14 @@
     // expose a small test helper and mark that client has mounted so tests can wait for hydration
     try {
       document.documentElement.setAttribute('data-topmaker-hydrated', '1');
-      // Only expose test helpers when running e2e tests. Tests can opt-in by adding ?e2e=1 to the URL.
-      const isE2E = typeof window !== 'undefined' && window.location && window.location.search && window.location.search.indexOf('e2e=1') !== -1;
+      // Only expose test helpers when running e2e tests. We prefer an env flag VITE_E2E set to 1/true,
+      // but fall back to the old query param for compatibility.
+      // import.meta.env is provided by Vite and includes VITE_* variables.
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const viteE2E = typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_E2E === '1' || import.meta.env.VITE_E2E === 'true');
+      const queryE2E = typeof window !== 'undefined' && window.location && window.location.search && window.location.search.indexOf('e2e=1') !== -1;
+      const isE2E = !!viteE2E || !!queryE2E;
       if (isE2E) {
         // allow tests to programmatically open the Add modal if clicks are unreliable in headless environments
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
