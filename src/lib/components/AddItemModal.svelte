@@ -114,7 +114,8 @@
   }
 </script>
 
-<div class="modal">
+  <div class="modal">
+  {#if mode === 'add'}
   <label>Fast entry
     <input
       placeholder="Coldplay [2026-06-20 Royal Albert Hall]"
@@ -133,6 +134,7 @@
   </label>
   {#if fastError}
     <div role="alert" class="fast-error">{fastError}</div>
+  {/if}
   {/if}
   <label>Artist<input name="artist" bind:value={artist} /></label>
   <label>Date<input name="date" type="date" bind:value={date} /></label>

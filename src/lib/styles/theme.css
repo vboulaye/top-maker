@@ -156,7 +156,9 @@ button.secondary {
   padding: var(--space-md);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
-  max-width: 640px;
+  /* Use the same width as the main content area to align with the page */
+  width: 100%;
+  max-width: 980px;
 }
 
 label { display:block; margin:0.5rem 0 }
