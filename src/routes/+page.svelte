@@ -133,7 +133,14 @@
       <p>Track and compare your best concerts of the year.</p>
     </div>
     <div class="top-actions">
-      <button bind:this={actionsToggleEl} class="actions-toggle" aria-expanded={showActionsMenu} on:click|stopPropagation={() => (showActionsMenu = !showActionsMenu)}>
+      <button
+        bind:this={actionsToggleEl}
+        class="actions-toggle"
+        aria-expanded={showActionsMenu}
+        aria-pressed={showActionsMenu}
+        on:click|stopPropagation={() => { console.log('actions toggle click', showActionsMenu); showActionsMenu = !showActionsMenu }}
+        on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showActionsMenu = !showActionsMenu } }}
+      >
         ☰ Actions
       </button>
     </div>
