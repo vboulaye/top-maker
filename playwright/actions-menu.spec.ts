@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { getBaseUrl } from './test-utils';
 
 test('actions menu opens on click and shows export/import actions', async ({ page }) => {
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
+  const url = getBaseUrl();
   await page.goto(url);
 
   const toggle = page.locator('button.actions-toggle');

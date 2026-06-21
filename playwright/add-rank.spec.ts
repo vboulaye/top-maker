@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { getBaseUrl } from './test-utils';
 
 test('add and rank flow inserts new item via comparisons', async ({ page }) => {
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
+  const url = getBaseUrl();
   await page.goto(url);
   // wait for app to render the Add button
   await page.locator('button:has-text("Add")').waitFor({ state: 'visible' });

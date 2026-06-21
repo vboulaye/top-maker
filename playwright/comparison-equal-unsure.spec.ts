@@ -1,7 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { getBaseUrl } from './test-utils';
 
 test('comparison equal inserts at same index (tie)', async ({ page }) => {
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
+  const url = getBaseUrl();
   await page.goto(url);
   await page.locator('button:has-text("Add")').waitFor({ state: 'visible' });
 
@@ -31,7 +32,7 @@ test('comparison equal inserts at same index (tie)', async ({ page }) => {
 });
 
 test('comparison unsure inserts after compared item (unsure)', async ({ page }) => {
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
+  const url = getBaseUrl();
   await page.goto(url);
 
   // Seed with one item

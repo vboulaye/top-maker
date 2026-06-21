@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import { getBaseUrl } from './test-utils';
 
 test('export then import JSON restores state', async ({ page, browser }) => {
   // Start app in dev mode is expected; for CI we assume preview is running at http://localhost:5173
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
+  const url = getBaseUrl();
   await page.goto(url);
 
   // Add an item using the Add button and form

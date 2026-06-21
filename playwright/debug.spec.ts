@@ -1,7 +1,8 @@
 import { test } from '@playwright/test';
+import { getBaseUrl } from './test-utils';
 
 test('debug page after add click', async ({ page }) => {
-  const url = process.env.PW_BASE_URL ?? 'http://localhost:4173';
+  const url = getBaseUrl();
   await page.goto(url);
   await page.waitForSelector('button:has-text("Add")');
   await page.click('button:has-text("Add")');
