@@ -13,9 +13,9 @@
   let showAdd = false;
   let theme: 'light' | 'dark' = 'light';
   let showCompare = false;
-  let showMobileActions = false;
-  let mobileActionsEl: HTMLElement | null = null;
-  let mobileToggleEl: HTMLElement | null = null;
+  let showActionsMenu = false;
+  let actionsEl: HTMLElement | null = null;
+  let actionsToggleEl: HTMLElement | null = null;
   let pendingNew: string | null = null;
   let comparePair: { newId: string; otherId: string; resolve: (value: 'a' | 'b' | 'tie' | 'unsure') => void } | null = null;
   let currentRanking: string[] = [];
@@ -71,19 +71,19 @@
     } else {
       applyTheme('light');
     }
-    // click-outside handler for mobile actions
+    // click-outside and escape handler for actions menu
     const onDoc = (e: MouseEvent) => {
       const target = e.target as Node | null;
-      if (!showMobileActions) return;
-      if (mobileActionsEl && mobileToggleEl) {
-        if (mobileActionsEl.contains(target) || mobileToggleEl.contains(target)) return;
-        showMobileActions = false;
+      if (!showActionsMenu) return;
+      if (actionsEl && actionsToggleEl) {
+        if (actionsEl.contains(target) || actionsToggleEl.contains(target)) return;
+        showActionsMenu = false;
       }
     };
     const onKeyDown = (e: KeyboardEvent) => {
-      if (!showMobileActions) return;
+      if (!showActionsMenu) return;
       if (e.key === 'Escape' || e.key === 'Esc') {
-        showMobileActions = false;
+        showActionsMenu = false;
       }
     };
     window.addEventListener('click', onDoc);
@@ -132,56 +132,14 @@
       <p>Track and compare your best concerts of the year.</p>
     </div>
     <div class="top-actions">
-      <button on:click={() => exportJsonFile()} class="secondary">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M12 3v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M8 7l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M21 21H3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>Export</span>
-      </button>
-      <label class="file-button">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <path d="M12 21V11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M8 15l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        <span>Import</span>
-        <input
-          type="file"
-          accept="application/json"
-          on:change={async (e) => {
-            const f = e.target.files && e.target.files[0];
-            if (!f) return;
-            const text = await f.text();
-            await importJsonText(text);
-          }}
-        />
-      </label>
-      {#if $storageStatus.canUseFileSystemApi}
-        <button on:click={() => openFromFileHandle()} class="secondary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M7 10l5-5 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Open</span>
-        </button>
-        <button on:click={() => saveToFileHandle()} class="secondary">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden>
-            <path d="M21 15V5a2 2 0 0 0-2-2H7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M7 21h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M17 21v-8H7v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-          <span>Save</span>
-        </button>
-      {/if}
-      <button bind:this={mobileToggleEl} class="mobile-toggle" aria-expanded={showMobileActions} on:click={() => (showMobileActions = !showMobileActions)}>
-        ☰
+      <button bind:this={actionsToggleEl} class="actions-toggle" aria-expanded={showActionsMenu} on:click={() => (showActionsMenu = !showActionsMenu)}>
+        ☰ Actions
       </button>
     </div>
 
-    {#if showMobileActions}
-      <div bind:this={mobileActionsEl} class="mobile-actions" role="menu">
-        <button role="menuitem" on:click={() => { exportJsonFile(); showMobileActions = false }} class="secondary">Export</button>
+    {#if showActionsMenu}
+      <div bind:this={actionsEl} class="actions-menu" role="menu">
+        <button role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
         <label class="file-button" role="menuitem">
           Import
           <input
@@ -192,14 +150,16 @@
               if (!f) return;
               const text = await f.text();
               await importJsonText(text);
-              showMobileActions = false;
+              showActionsMenu = false;
             }}
           />
         </label>
         {#if $storageStatus.canUseFileSystemApi}
-          <button role="menuitem" on:click={() => { openFromFileHandle(); showMobileActions = false }} class="secondary">Open File</button>
-          <button role="menuitem" on:click={() => { saveToFileHandle(); showMobileActions = false }} class="secondary">Save File</button>
+          <button role="menuitem" on:click={() => { openFromFileHandle(); showActionsMenu = false }} class="secondary">Open File</button>
+          <button role="menuitem" on:click={() => { saveToFileHandle(); showActionsMenu = false }} class="secondary">Save File</button>
         {/if}
+        <div class="menu-sep" />
+        <button role="menuitem" on:click={() => { toggleTheme(); showActionsMenu = false }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
       </div>
     {/if}
   </div>
