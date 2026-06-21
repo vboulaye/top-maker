@@ -20,6 +20,7 @@
   let comparePair: { newId: string; otherId: string; resolve: (value: 'a' | 'b' | 'tie' | 'unsure') => void } | null = null;
   let currentRanking: string[] = [];
   let itemsForDisplay: Array<any> = [];
+  let importInput: HTMLInputElement | null = null;
 
   const rankingKey = { type: 'concert', year: new Date().getFullYear() };
   const rankingStoreKey = `${rankingKey.type}:${rankingKey.year}`;
@@ -145,22 +146,26 @@
       </button>
 
       {#if showActionsMenu}
-        <div bind:this={actionsEl} class="actions-menu" role="menu" on:click|stopPropagation>
+        <div bind:this={actionsEl} class="actions-menu" role="menu" tabindex="0" on:click|stopPropagation>
           <button role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
-          <label class="file-button" role="menuitem">
+          <!-- use a button to open the file picker for accessibility; trigger hidden input click -->
+          <button
+            role="menuitem"
+            class="file-button"
+            on:click={async () => {
+              // trigger hidden input
+              if (importInput) importInput.click();
+            }}
+          >
             Import
-            <input
-              type="file"
-              accept="application/json"
-              on:change={async (e) => {
-                const f = e.target.files && e.target.files[0];
-                if (!f) return;
-                const text = await f.text();
-                await importJsonText(text);
-                showActionsMenu = false;
-              }}
-            />
-          </label>
+          </button>
+          <input bind:this={importInput} type="file" accept="application/json" style="display:none" on:change={async (e) => {
+            const f = e.target.files && e.target.files[0];
+            if (!f) return;
+            const text = await f.text();
+            await importJsonText(text);
+            showActionsMenu = false;
+          }} />
           {#if $storageStatus.canUseFileSystemApi}
             <button role="menuitem" on:click={() => { openFromFileHandle(); showActionsMenu = false }} class="secondary">Open File</button>
             <button role="menuitem" on:click={() => { saveToFileHandle(); showActionsMenu = false }} class="secondary">Save File</button>
