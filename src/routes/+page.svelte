@@ -100,6 +100,17 @@
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       window.__topmaker_openAdd = () => { showAdd = true; };
+      // expose an export helper so tests can obtain exported JSON without relying on downloads
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      window.__topmaker_export = async () => {
+        try {
+          // reuse existing exportJsonFile but capture blob via createObjectURL override in tests if needed
+          return await exportJsonFile();
+        } catch (e) {
+          return null;
+        }
+      };
     } catch (e) {}
   });
 
@@ -156,7 +167,7 @@
 
       {#if showActionsMenu}
         <div bind:this={actionsEl} class="actions-menu" role="menu" tabindex="0" on:click|stopPropagation>
-          <button role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
+          <button data-test="actions-export" role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
           <!-- use a button to open the file picker for accessibility; trigger hidden input click -->
           <button
             role="menuitem"
@@ -168,13 +179,7 @@
           >
             Import
           </button>
-          <input bind:this={importInput} type="file" accept="application/json" style="display:none" on:change={async (e) => {
-            const f = e.target.files && e.target.files[0];
-            if (!f) return;
-            const text = await f.text();
-            await importJsonText(text);
-            showActionsMenu = false;
-          }} />
+          
           {#if $storageStatus.canUseFileSystemApi}
             <button role="menuitem" on:click={() => { openFromFileHandle(); showActionsMenu = false }} class="secondary">Open File</button>
             <button role="menuitem" on:click={() => { saveToFileHandle(); showActionsMenu = false }} class="secondary">Save File</button>
@@ -190,6 +195,15 @@
     <button on:click={() => (showAdd = true)} class="primary">Add</button>
     <div class="spacer"></div>
   </div>
+
+  <!-- Hidden import input placed after controls so tests can locate it reliably -->
+  <input bind:this={importInput} id="actions-import-input" type="file" accept="application/json" style="display:none" on:change={async (e) => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const text = await f.text();
+    await importJsonText(text);
+    showActionsMenu = false;
+  }} />
 
   {#if showAdd}
     <AddItemModal
