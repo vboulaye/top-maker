@@ -11,6 +11,7 @@
   import { findInsertIndex } from '$lib/ranking/insertion.js';
 
   let showAdd = false;
+  let editingItem: { id: string; data: { artist?: string; date?: string; venue?: string } } | null = null;
   let theme: 'light' | 'dark' = 'light';
   let showCompare = false;
   let showActionsMenu = false;
@@ -101,7 +102,7 @@
       // @ts-ignore
       const viteE2E = typeof import.meta !== 'undefined' && import.meta.env && (import.meta.env.VITE_E2E === '1' || import.meta.env.VITE_E2E === 'true');
       const isE2E = !!viteE2E;
-      if (isE2E) {
+  if (isE2E) {
         // allow tests to programmatically open the Add modal if clicks are unreliable in headless environments
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -130,6 +131,15 @@
     await addItem(item);
     const ranking = await getRanking(rankingKey);
     await insertAt(rankingKey, ranking.length, id);
+    showAdd = false;
+  }
+
+  async function onUpdateItem(id: string, data: { artist?: string; date?: string; venue?: string }) {
+    // use itemsStore.updateItem
+    // import lazily to avoid circular at top-level
+    const mod = await import('$lib/stores/itemsStore');
+    if (mod.updateItem) await mod.updateItem(id, data);
+    editingItem = null;
     showAdd = false;
   }
 
@@ -217,8 +227,14 @@
 
   {#if showAdd}
     <AddItemModal
+      initial={editingItem ? editingItem.data : null}
+      mode={editingItem ? 'edit' : 'add'}
       on:add={(ev) => (ev.detail.rank ? onAddAndRank(ev.detail.data) : onAddWithoutRanking(ev.detail.data))}
-      on:cancel={() => (showAdd = false)}
+      on:update={async (ev) => {
+        if (!editingItem) return;
+        await onUpdateItem(editingItem.id, ev.detail.data);
+      }}
+      on:cancel={() => { editingItem = null; showAdd = false }}
     />
   {/if}
 

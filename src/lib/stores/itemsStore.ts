@@ -68,6 +68,25 @@ export async function exportItems() {
   return current;
 }
 
+export async function updateItem(id: string, nextData: Partial<Item['data']>) {
+  // merge with existing item in-memory or persisted
+  let existing: Item | undefined;
+  items.subscribe(m => { if (m[id]) existing = m[id]; })();
+  if (!existing && browser && dbPromise) {
+    const db = await dbPromise;
+    existing = await db.get('items', id);
+  }
+  if (!existing) return;
+
+  const updated: Item = { ...existing, data: { ...existing.data, ...nextData } };
+
+  if (browser && dbPromise) {
+    const db = await dbPromise;
+    await db.put('items', updated);
+  }
+  items.update(m => ({ ...m, [id]: updated }));
+}
+
 export async function replaceItems(next: Record<string, Item>) {
   // replace in-memory
   items.set(next);

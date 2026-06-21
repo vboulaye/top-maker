@@ -70,3 +70,30 @@ test('export then import JSON restores state', async ({ page, browser }) => {
   // Clean up
   fs.unlinkSync(tmp);
 });
+
+test('edit an item updates UI and persists', async ({ page }) => {
+  const url = getBaseUrl();
+  await page.goto(url);
+  await page.waitForSelector('[data-topmaker-hydrated="1"]');
+  // open add modal and add an item
+  await page.evaluate(() => (window as any).__topmaker_openAdd && (window as any).__topmaker_openAdd());
+  await page.getByLabel('Artist').fill('EditMe');
+  await page.getByLabel('Date').fill('2026-06-10');
+  await page.getByLabel('Venue').fill('Venue E');
+  await page.click('button:has-text("Add and Rank")');
+
+  // ensure item present
+  await expect(page.locator('text=EditMe')).toHaveCount(1);
+
+  // click Edit button on the item card
+  const editBtn = page.locator('button[aria-label^="Edit EditMe"]');
+  await editBtn.click();
+
+  // Modal should open with Artist field populated
+  await page.getByLabel('Artist').waitFor({ state: 'visible' });
+  await page.getByLabel('Artist').fill('Edited Artist');
+  await page.click('button:has-text("Save")');
+
+  // verify updated text appears
+  await expect(page.locator('text=Edited Artist')).toHaveCount(1);
+});

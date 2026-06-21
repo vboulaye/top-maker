@@ -1,6 +1,9 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
   export let onAddAndRank: (data: any) => void;
+  // initial values when used for editing
+  export let initial: { artist?: string; date?: string; venue?: string } | null = null;
+  export let mode: 'add' | 'edit' = 'add';
 
   let artist = '';
   let date = '';
@@ -17,7 +20,12 @@
     // clear fastEntry after using it
     if (parsed) fastEntry = '';
     if (onAddAndRank) onAddAndRank(data);
-    dispatch('add', { data, rank: true });
+    if (mode === 'edit') {
+      // emit update event including id must be provided by parent via initial in edit mode
+      dispatch('update', { data });
+    } else {
+      dispatch('add', { data, rank: true });
+    }
   }
 
   // Parse fast-entry format: "Artist [YYYY-MM-DD Location...]"
@@ -82,7 +90,8 @@
     fastEntry = '';
     // use addAndRank (without comparisons) to add and close modal — we no longer have addWithout
     if (onAddAndRank) onAddAndRank({ artist, date, venue });
-    dispatch('add', { data: { artist, date, venue }, rank: false });
+    if (mode === 'edit') dispatch('update', { data: { artist, date, venue } });
+    else dispatch('add', { data: { artist, date, venue }, rank: false });
   }
 
   // Live-parse fastEntry so clicking "Add and Rank" uses parsed values
@@ -95,6 +104,13 @@
       venue = p.venue || '';
       fastError = null;
     }
+  }
+
+  // if initial values provided (edit mode), initialize fields
+  $: if (initial) {
+    artist = initial.artist || '';
+    date = initial.date || '';
+    venue = initial.venue || '';
   }
 </script>
 
@@ -122,7 +138,7 @@
   <label>Date<input name="date" type="date" bind:value={date} /></label>
   <label>Venue<input name="venue" bind:value={venue} /></label>
   <div class="actions">
-    <button on:click={addAndRank}>Add and Rank</button>
+    <button on:click={addAndRank}>{mode === 'edit' ? 'Save' : 'Add and Rank'}</button>
     <button class="secondary" on:click={() => { fastEntry = ''; fastError = null; artist = ''; date = ''; venue = ''; dispatch('cancel'); }}>
       Cancel
     </button>
