@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, tick } from 'svelte';
   export let onAddAndRank: (data: any) => void;
   // initial values when used for editing
   export let initial: { artist?: string; date?: string; venue?: string } | null = null;
@@ -10,6 +10,7 @@
   let venue = '';
   let fastEntry = '';
   let fastError: string | null = null;
+  let artistInput: HTMLInputElement | null = null;
 
   const dispatch = createEventDispatcher();
 
@@ -115,9 +116,19 @@
 
   // ensure that when used inline (not as backdrop modal) the container stretches
   export let inline: boolean = false;
+  // Autofocus artist input when inline edit opens
+  $: if (inline && mode === 'edit') {
+    (async () => {
+      await tick();
+      try {
+        artistInput?.focus();
+        if ((artistInput as any)?.select) (artistInput as any).select();
+      } catch (e) {}
+    })();
+  }
 </script>
 
-<div class="modal" style={inline ? 'box-shadow:none; padding:0; background:transparent' : ''}>
+<div class="modal" style={inline ? 'box-shadow:none; padding:0; background:transparent' : ''} on:click={(e) => { if (inline) e.stopPropagation(); }} on:keydown={(e) => { if (inline && e.key === 'Escape') { e.stopPropagation(); dispatch('cancel'); } }}>
   {#if mode === 'add'}
   <label>Fast entry
     <input
@@ -139,7 +150,7 @@
     <div role="alert" class="fast-error">{fastError}</div>
   {/if}
   {/if}
-  <label>Artist<input name="artist" bind:value={artist} /></label>
+  <label>Artist<input name="artist" bind:this={artistInput} bind:value={artist} /></label>
   <label>Date<input name="date" type="date" bind:value={date} /></label>
   <label>Venue<input name="venue" bind:value={venue} /></label>
   <div class="actions">

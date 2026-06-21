@@ -2,7 +2,7 @@
   import AddItemModal from '$lib/components/AddItemModal.svelte';
   import ComparisonModal from '$lib/components/ComparisonModal.svelte';
   import RankedList from '$lib/components/RankedList.svelte';
-  import { onMount, onDestroy } from 'svelte';
+  import { onMount, onDestroy, tick } from 'svelte';
   import { storageStatus, exportJsonFile, importJsonText, openFromFileHandle, saveToFileHandle } from '$lib/stores/storageStore';
   // undo feature removed
   import { items } from '$lib/stores/itemsStore';
@@ -141,6 +141,11 @@
     if (mod.updateItem) await mod.updateItem(id, data);
     editingItem = null;
     showAdd = false;
+    await tick();
+    try {
+      const el = document.querySelector(`[data-item-id="${id}"]`) as HTMLElement | null;
+      if (el) el.focus();
+    } catch (e) {}
   }
 
   function compareFn(newId: string, otherId: string) {
@@ -257,7 +262,15 @@
       // e.detail: { id, data }
       await onUpdateItem(e.detail.id, e.detail.data);
     }}
-    on:cancel-edit={() => { editingItem = null }}
+    on:cancel-edit={async (e) => {
+      const prev = editingItem ? editingItem.id : null;
+      editingItem = null;
+      await tick();
+      try {
+        const el = document.querySelector(`[data-item-id="${prev}"]`) as HTMLElement | null;
+        if (el) el.focus();
+      } catch (e) {}
+    }}
   />
   {#if $storageStatus.lastAction}
     <div class="storage-status">{$storageStatus.lastAction}</div>

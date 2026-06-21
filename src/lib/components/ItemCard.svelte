@@ -27,7 +27,7 @@
   }
 </script>
 
-<div class="item-card" on:click={editing ? undefined : (e) => handleCardClick(e)} tabindex="0" on:keydown={editing ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(e as any); } }}>
+<div class="item-card" data-item-id={item.id} on:click={editing ? undefined : (e) => handleCardClick(e)} tabindex="0" on:keydown={editing ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(e as any); } }}>
   <div class="header">
     {#if !editing}
       <div class="title">{item?.data?.artist ?? item?.id}</div>
