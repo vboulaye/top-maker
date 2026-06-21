@@ -102,6 +102,20 @@ p { margin-top: 0.25rem; color: var(--muted) }
 .actions-menu .file-button span { font-weight:600 }
 .actions-menu .file-button input { display:none }
 
+/* Normalize menu item sizing and alignment */
+.actions-menu > button,
+.actions-menu .file-button {
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  padding:0.5rem 0.75rem;
+  min-height:36px;
+  box-sizing:border-box;
+}
+.actions-menu > button span,
+.actions-menu .file-button { line-height:1 }
+.actions-menu svg { flex:0 0 auto }
+
 /* Buttons */
 button {
   background: transparent;
