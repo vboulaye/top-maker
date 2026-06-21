@@ -24,7 +24,8 @@ async function main() {
   console.log(`Starting preview server on port ${PREVIEW_PORT}...`);
   // spawn vite preview directly via npx so the child process is the server and is killable
   // spawn vite preview via npx and detach so we can kill the whole process group reliably
-  const serverProc = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['vite', 'preview', '--port', String(PREVIEW_PORT)], {
+  // run the dev server (not preview) so Playwright can interact with HMR content during development
+  const serverProc = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['vite', 'dev', '--port', String(PREVIEW_PORT)], {
     stdio: ['ignore', 'inherit', 'inherit'],
     detached: true
   });
