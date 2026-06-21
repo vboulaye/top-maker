@@ -95,26 +95,28 @@
     // expose a small test helper and mark that client has mounted so tests can wait for hydration
     try {
       document.documentElement.setAttribute('data-topmaker-hydrated', '1');
-      // allow tests to programmatically open the Add modal if clicks are unreliable in headless environments
-      // (useful only for automated tests)
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.__topmaker_openAdd = () => { showAdd = true; };
-      // expose helper to open actions menu for tests
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.__topmaker_openActions = () => { showActionsMenu = true; };
-      // expose an export helper so tests can obtain exported JSON without relying on downloads
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      window.__topmaker_export = async () => {
-        try {
-          // reuse existing exportJsonFile but capture blob via createObjectURL override in tests if needed
-          return await exportJsonFile();
-        } catch (e) {
-          return null;
-        }
-      };
+      // Only expose test helpers when running e2e tests. Tests can opt-in by adding ?e2e=1 to the URL.
+      const isE2E = typeof window !== 'undefined' && window.location && window.location.search && window.location.search.indexOf('e2e=1') !== -1;
+      if (isE2E) {
+        // allow tests to programmatically open the Add modal if clicks are unreliable in headless environments
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        window.__topmaker_openAdd = () => { showAdd = true; };
+        // expose helper to open actions menu for tests
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        window.__topmaker_openActions = () => { showActionsMenu = true; };
+        // expose an export helper so tests can obtain exported JSON without relying on downloads
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        window.__topmaker_export = async () => {
+          try {
+            return await exportJsonFile();
+          } catch (e) {
+            return null;
+          }
+        };
+      }
     } catch (e) {}
   });
 
