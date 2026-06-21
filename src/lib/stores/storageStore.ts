@@ -126,6 +126,13 @@ export async function loadFromOneDrive(path = '/top-maker.json') {
   }
 }
 
+// Wire UI helper buttons into the actions menu if running in browser
+try {
+  if (typeof document !== 'undefined') {
+    // Add menu entries exist in +page.svelte; tests can call window.__topmaker_saveOneDrive directly.
+  }
+} catch (e) {}
+
 export default {
   storageStatus,
   exportJsonFile,

@@ -209,6 +209,8 @@
             <button role="menuitem" on:click={() => { openFromFileHandle(); showActionsMenu = false }} class="secondary">Open File</button>
             <button role="menuitem" on:click={() => { saveToFileHandle(); showActionsMenu = false }} class="secondary">Save File</button>
           {/if}
+          <button role="menuitem" on:click={async () => { try { await (window as any).__topmaker_saveOneDrive && (window as any).__topmaker_saveOneDrive(); } catch (e) { console.error(e) } finally { showActionsMenu = false } }} class="secondary">Save to OneDrive</button>
+          <button role="menuitem" on:click={async () => { try { await (window as any).__topmaker_loadOneDrive && (window as any).__topmaker_loadOneDrive(); } catch (e) { console.error(e) } finally { showActionsMenu = false } }} class="secondary">Load from OneDrive</button>
           <div class="menu-sep"></div>
           <button role="menuitem" on:click={() => { toggleTheme(); showActionsMenu = false }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
         </div>
