@@ -114,6 +114,14 @@ p { margin-top: 0.25rem; color: var(--muted) }
 }
 .actions-menu > button span,
 .actions-menu .file-button { line-height:1 }
+
+/* Ensure consistent font sizing for menu items */
+.actions-menu > button,
+.actions-menu .file-button,
+.actions-menu > button span,
+.actions-menu .file-button span {
+  font-size: var(--type-base);
+}
 .actions-menu svg { flex:0 0 auto }
 
 /* Buttons */
