@@ -1,13 +1,20 @@
 <script lang="ts">
   import ItemCard from './ItemCard.svelte';
+  import { createEventDispatcher } from 'svelte';
   export let items: any[] = []; // array of item objects
+  const dispatch = createEventDispatcher();
+
+  function onEdit(ev: CustomEvent) {
+    // forward edit events from ItemCard
+    dispatch('edit', ev.detail);
+  }
 </script>
 
 <div class="ranked-list">
   {#each items as item, i}
     <div class="rank-row">
       <div class="pos">#{i+1}</div>
-      <div class="row-content"><ItemCard {item} /></div>
+      <div class="row-content"><ItemCard {item} on:edit={onEdit} /></div>
     </div>
   {/each}
 </div>

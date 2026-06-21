@@ -246,7 +246,7 @@
     />
   {/if}
 
-  <RankedList items={itemsForDisplay} />
+  <RankedList items={itemsForDisplay} on:edit={(e) => { editingItem = { id: e.detail.id, data: e.detail.data }; showAdd = true }} />
   {#if $storageStatus.lastAction}
     <div class="storage-status">{$storageStatus.lastAction}</div>
   {/if}
