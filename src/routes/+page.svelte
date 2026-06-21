@@ -80,8 +80,16 @@
         showMobileActions = false;
       }
     };
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (!showMobileActions) return;
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        showMobileActions = false;
+      }
+    };
     window.addEventListener('click', onDoc);
+    window.addEventListener('keydown', onKeyDown);
     onDestroy(() => window.removeEventListener('click', onDoc));
+    onDestroy(() => window.removeEventListener('keydown', onKeyDown));
   });
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {
