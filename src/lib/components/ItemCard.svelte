@@ -27,11 +27,11 @@
   }
 </script>
 
-<div class="item-card" data-item-id={item.id} on:click={editing ? undefined : (e) => handleCardClick(e)} tabindex="0" on:keydown={editing ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(e as any); } }}>
+<div class="item-card" data-item-id={item.id} role={editing ? undefined : 'button'} on:click={editing ? undefined : (e) => handleCardClick(e)} tabindex={editing ? undefined : 0} on:keydown={editing ? undefined : (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(e as any); } }}>
   <div class="header">
     {#if !editing}
       <div class="title">{item?.data?.artist ?? item?.id}</div>
-      <button class="edit-button" aria-label={`Edit ${item?.data?.artist || item?.id}`} on:click|stopPropagation={onEdit} title="Edit">
+      <button class="edit-button" aria-label="Edit" on:click|stopPropagation={onEdit} title={`Edit ${item?.data?.artist || item?.id}`}>
       <!-- simple pencil icon -->
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
         <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25z" fill="currentColor" />

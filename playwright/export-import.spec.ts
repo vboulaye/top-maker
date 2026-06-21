@@ -85,11 +85,11 @@ test('edit an item updates UI and persists', async ({ page }) => {
   // ensure item present
   await expect(page.locator('text=EditMe')).toHaveCount(1);
 
-  // click Edit button on the item card
-  const editBtn = page.locator('button[aria-label^="Edit EditMe"]');
-  await editBtn.click();
+  // open inline editor by clicking the card
+  const card = page.locator('[data-item-id]').filter({ hasText: 'EditMe' }).first();
+  await card.click();
 
-  // Modal should open with Artist field populated
+  // Inline editor should open with Artist field populated
   await page.getByLabel('Artist').waitFor({ state: 'visible' });
   await page.getByLabel('Artist').fill('Edited Artist');
   await page.click('button:has-text("Save")');
