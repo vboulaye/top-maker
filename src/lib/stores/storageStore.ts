@@ -4,6 +4,7 @@ import { exportItems, replaceItems } from '$lib/stores/itemsStore';
 import { exportRankings, replaceRankings } from '$lib/stores/rankingStore';
 import { exportComparisons, replaceComparisons } from '$lib/stores/comparisonsStore';
 import { canUseFileSystemApi, pickOpenFile, pickSaveFile, readHandleText, writeHandleText } from '$lib/storage/fileAccess';
+import OneDrive from '$lib/storage/onedrive';
 
 export const storageStatus = writable({
   canUseFileSystemApi: typeof window !== 'undefined' && canUseFileSystemApi(),
@@ -11,6 +12,21 @@ export const storageStatus = writable({
   lastError: null as string | null,
   currentFileHandle: null as any | null
 });
+
+// expose helper to open OneDrive auth flow in E2E if needed
+try {
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.__topmaker_saveOneDrive = async (path?: string) => {
+      return await saveToOneDrive(path);
+    };
+    // @ts-ignore
+    window.__topmaker_loadOneDrive = async (path?: string) => {
+      return await loadFromOneDrive(path);
+    };
+  }
+} catch (e) {}
 
 export async function exportJsonFile() {
   try {
@@ -80,6 +96,32 @@ export async function saveToFileHandle() {
     storageStatus.update((s) => ({ ...s, currentFileHandle: handle, lastAction: 'saved-file', lastError: null }));
   } catch (err) {
     storageStatus.update((s) => ({ ...s, lastError: 'failed-save-file' }));
+    throw err;
+  }
+}
+
+export async function saveToOneDrive(path = '/top-maker.json') {
+  try {
+    // ensure tokens exist or prompt user
+    await OneDrive.ensureAuthenticatedInteractive();
+    const snapshot = buildSnapshot({ items: await exportItems(), rankings: await exportRankings(), comparisons: await exportComparisons() });
+    const json = snapshotToJson(snapshot);
+    await OneDrive.uploadFileToOneDrive(path, json);
+    storageStatus.update((s) => ({ ...s, lastAction: 'saved-onedrive', lastError: null }));
+  } catch (err) {
+    storageStatus.update((s) => ({ ...s, lastError: 'failed-save-onedrive' }));
+    throw err;
+  }
+}
+
+export async function loadFromOneDrive(path = '/top-maker.json') {
+  try {
+    await OneDrive.ensureAuthenticatedInteractive();
+    const txt = await OneDrive.downloadFileFromOneDrive(path);
+    await importJsonText(txt);
+    storageStatus.update((s) => ({ ...s, lastAction: 'loaded-onedrive', lastError: null }));
+  } catch (err) {
+    storageStatus.update((s) => ({ ...s, lastError: 'failed-load-onedrive' }));
     throw err;
   }
 }
