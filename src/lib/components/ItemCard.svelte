@@ -29,7 +29,9 @@
 
 <div class="item-card" on:click={(e) => handleCardClick(e)} tabindex="0" on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handleCardClick(e as any); } }}>
   <div class="header">
-    <div class="title">{item?.data?.artist ?? item?.id}</div>
+    {#if !editing}
+      <div class="title">{item?.data?.artist ?? item?.id}</div>
+    {/if}
     <button class="edit-button" aria-label={`Edit ${item?.data?.artist || item?.id}`} on:click|stopPropagation={onEdit} title="Edit">
       <!-- simple pencil icon -->
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
