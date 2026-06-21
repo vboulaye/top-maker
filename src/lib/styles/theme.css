@@ -114,6 +114,13 @@ input:focus { outline: 3px solid rgba(124,58,237,0.08); outline-offset: 2px }
 /* Utility */
 .row { display:flex; gap:var(--space-sm); align-items:center }
 
+/* Ranked list row styling to enforce equal widths */
+.ranked-list { width: 100% }
+.rank-row { align-items:stretch }
+.pos { flex: 0 0 3rem }
+.row-content { display:block }
+
+
 /* Modal backdrop and animations */
 .modal-backdrop {
   position: fixed;
