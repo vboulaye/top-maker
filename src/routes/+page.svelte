@@ -95,9 +95,18 @@
       showActionsMenu = !showActionsMenu;
     };
     if (actionsToggleEl) actionsToggleEl.addEventListener('click', toggleHandler);
+    // mirror state to <body> attribute to help with some browser style ordering
+    const reflect = () => {
+      try { document.body.setAttribute('data-actions-open', showActionsMenu ? 'true' : 'false'); } catch (e) {}
+    };
+    const obs = new MutationObserver(reflect);
+    obs.observe(document.body, { attributes: true });
+    // update on mutation loop
+    const interval = setInterval(reflect, 50);
     onDestroy(() => window.removeEventListener('click', onDoc));
     onDestroy(() => window.removeEventListener('keydown', onKeyDown));
     onDestroy(() => { if (actionsToggleEl) actionsToggleEl.removeEventListener('click', toggleHandler); });
+    onDestroy(() => { obs.disconnect(); clearInterval(interval); });
   });
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {

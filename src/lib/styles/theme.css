@@ -84,7 +84,8 @@ p { margin-top: 0.25rem; color: var(--muted) }
 
 /* actions menu (collapsible) */
 .actions-toggle { display:inline-flex; gap:0.5rem; align-items:center; padding:0.45rem 0.6rem; border-radius:6px }
-.actions-menu { position:absolute; right:0; top:calc(100% + 0.5rem); background:var(--surface); border:1px solid rgba(15,23,42,0.06); padding:0.5rem; border-radius:8px; box-shadow:var(--shadow-md); display:flex; flex-direction:column; gap:0.5rem; min-width:160px; z-index:300 }
+.actions-menu { position:absolute; right:0; top:calc(100% + 0.5rem); background:var(--surface); border:1px solid rgba(15,23,42,0.06); padding:0.5rem; border-radius:8px; box-shadow:var(--shadow-md); display:none; flex-direction:column; gap:0.5rem; min-width:160px; z-index:300 }
+body[data-actions-open="true"] .actions-menu { display:flex }
 .menu-sep { height:1px; background:rgba(15,23,42,0.04); margin:0.25rem 0 }
 
 /* Buttons */
