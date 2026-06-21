@@ -13,6 +13,7 @@
   let showAdd = false;
   let theme: 'light' | 'dark' = 'light';
   let showCompare = false;
+  let showMobileActions = false;
   let pendingNew: string | null = null;
   let comparePair: { newId: string; otherId: string; resolve: (value: 'a' | 'b' | 'tie' | 'unsure') => void } | null = null;
   let currentRanking: string[] = [];
@@ -152,7 +153,34 @@
           <span>Save</span>
         </button>
       {/if}
+      <button class="mobile-toggle" aria-expanded={showMobileActions} on:click={() => (showMobileActions = !showMobileActions)}>
+        ☰
+      </button>
     </div>
+
+    {#if showMobileActions}
+      <div class="mobile-actions" role="menu">
+        <button role="menuitem" on:click={() => { exportJsonFile(); showMobileActions = false }} class="secondary">Export</button>
+        <label class="file-button" role="menuitem">
+          Import
+          <input
+            type="file"
+            accept="application/json"
+            on:change={async (e) => {
+              const f = e.target.files && e.target.files[0];
+              if (!f) return;
+              const text = await f.text();
+              await importJsonText(text);
+              showMobileActions = false;
+            }}
+          />
+        </label>
+        {#if $storageStatus.canUseFileSystemApi}
+          <button role="menuitem" on:click={() => { openFromFileHandle(); showMobileActions = false }} class="secondary">Open File</button>
+          <button role="menuitem" on:click={() => { saveToFileHandle(); showMobileActions = false }} class="secondary">Save File</button>
+        {/if}
+      </div>
+    {/if}
   </div>
 
   <div class="controls">
