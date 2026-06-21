@@ -141,7 +141,7 @@
         on:click|stopPropagation={() => { showActionsMenu = !showActionsMenu }}
         on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showActionsMenu = !showActionsMenu } }}
       >
-        ☰ Actions
+        ☰
       </button>
 
       {#if showActionsMenu}
