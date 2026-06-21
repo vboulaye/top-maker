@@ -139,7 +139,7 @@
     </div>
 
     {#if showActionsMenu}
-      <div bind:this={actionsEl} class="actions-menu" role="menu">
+      <div bind:this={actionsEl} class="actions-menu" role="menu" on:click|stopPropagation>
         <button role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
         <label class="file-button" role="menuitem">
           Import
