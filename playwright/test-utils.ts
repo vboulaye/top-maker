@@ -8,6 +8,5 @@ export const BASE_URL = process.env.PW_BASE_URL ?? `http://localhost:${port}`;
  */
 export function getBaseUrl() {
   const preferEnv = process.env.VITE_E2E === '1' || process.env.VITE_E2E === 'true' || process.env.PREVIEW_E2E === '1';
-  if (preferEnv) return BASE_URL;
-  return `${BASE_URL}?e2e=1`;
+  return BASE_URL;
 }
