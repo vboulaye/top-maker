@@ -6,6 +6,7 @@
   const dispatch = createEventDispatcher();
 
   function onEdit() {
+    // if already editing, clicking should signal cancel intent; parent toggles
     dispatch('edit', { id: item.id, data: item.data });
   }
 

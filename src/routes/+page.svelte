@@ -245,7 +245,14 @@
   <RankedList
     items={itemsForDisplay}
     editingId={editingItem ? editingItem.id : null}
-    on:edit={(e) => { editingItem = { id: e.detail.id, data: e.detail.data }; }}
+    on:edit={(e) => {
+      // toggle edit: clicking edit for the currently-editing item cancels edit
+      if (editingItem && editingItem.id === e.detail.id) {
+        editingItem = null;
+      } else {
+        editingItem = { id: e.detail.id, data: e.detail.data };
+      }
+    }}
     on:update={async (e) => {
       // e.detail: { id, data }
       await onUpdateItem(e.detail.id, e.detail.data);
