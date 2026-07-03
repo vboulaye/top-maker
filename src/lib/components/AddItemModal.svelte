@@ -4,12 +4,17 @@
   // initial values when used for editing
   export let initial: { artist?: string; date?: string; venue?: string } | null = null;
   export let mode: 'add' | 'edit' = 'add';
+  // Enable bulk paste tab
+  export let enableBulkPaste: boolean = true;
 
   let artist = '';
   let date = '';
   let venue = '';
   let fastEntry = '';
   let fastError: string | null = null;
+  let bulkText = '';
+  let bulkPreview: Array<{ artist: string; date: string; venue: string }> = [];
+  let activeTab: 'single' | 'paste' = 'single';
   let artistInput: HTMLInputElement | null = null;
 
   const dispatch = createEventDispatcher();
@@ -67,6 +72,18 @@
     return { artist: artistPart, date: '', venue: inside };
   }
 
+  function parseMultiple(text: string) {
+    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    const parsed: Array<{ artist: string; date: string; venue: string }> = [];
+    for (const l of lines) {
+      const p = parseFastEntry(l);
+      if (p && p.artist && p.date && p.venue) {
+        parsed.push({ artist: p.artist, date: p.date!, venue: p.venue! });
+      }
+    }
+    return parsed;
+  }
+
   function submitFastEntry() {
     fastError = null;
     const parsed = parseFastEntry(fastEntry || '');
@@ -93,6 +110,19 @@
     if (onAddAndRank) onAddAndRank({ artist, date, venue });
     if (mode === 'edit') dispatch('update', { data: { artist, date, venue } });
     else dispatch('add', { data: { artist, date, venue }, rank: false });
+  }
+
+  function updateBulkPreview() {
+    bulkPreview = parseMultiple(bulkText);
+  }
+
+  function submitBulk() {
+    // dispatch an event with parsed entries
+    const entries = parseMultiple(bulkText);
+    if (entries.length === 0) return;
+    dispatch('add-multiple', { entries });
+    bulkText = '';
+    bulkPreview = [];
   }
 
   // Live-parse fastEntry so clicking "Add and Rank" uses parsed values
@@ -138,25 +168,50 @@
   on:keydown={(e) => { if (inline && e.key === 'Escape') { e.stopPropagation(); dispatch('cancel'); } }}
 >
   {#if mode === 'add'}
-  <label>Fast entry
-    <input
-      placeholder="Coldplay [2026-06-20 Royal Albert Hall]"
-      bind:value={fastEntry}
-      on:keydown={(e) => {
-        if (e.key === 'Enter') {
-          e.preventDefault();
-          submitFastEntry();
-        }
-        if (e.key === 'Escape') {
-          fastEntry = '';
-          fastError = null;
-        }
-      }}
-    />
-  </label>
-  {#if fastError}
-    <div role="alert" class="fast-error">{fastError}</div>
-  {/if}
+    <div class="tabs">
+      <button on:click={() => activeTab = 'single'} class:active={activeTab === 'single'}>Single</button>
+      {#if enableBulkPaste}
+        <button on:click={() => activeTab = 'paste'} class:active={activeTab === 'paste'}>Paste multiple</button>
+      {/if}
+    </div>
+
+    {#if activeTab === 'single'}
+      <label>Fast entry
+        <input
+          placeholder="Coldplay [2026-06-20 Royal Albert Hall]"
+          bind:value={fastEntry}
+          on:keydown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              submitFastEntry();
+            }
+            if (e.key === 'Escape') {
+              fastEntry = '';
+              fastError = null;
+            }
+          }}
+        />
+      </label>
+      {#if fastError}
+        <div role="alert" class="fast-error">{fastError}</div>
+      {/if}
+    {:else}
+      <label>Paste entries (one per line)
+        <textarea bind:value={bulkText} on:input={updateBulkPreview} rows="6" placeholder="Artist [YYYY-MM-DD Venue]\nAnother Artist [YYYY-MM-DD Venue]"></textarea>
+      </label>
+      <div class="bulk-preview">
+        <h4>Parsed Entries ({bulkPreview.length})</h4>
+        <ul>
+          {#each bulkPreview as e}
+            <li>{e.artist} — {e.date} — {e.venue}</li>
+          {/each}
+        </ul>
+        <div class="actions">
+          <button class="primary" on:click={submitBulk}>Add and Rank All</button>
+          <button class="secondary" on:click={() => { bulkText=''; bulkPreview=[]; }}>Clear</button>
+        </div>
+      </div>
+    {/if}
   {/if}
   <label>Artist<input name="artist" bind:this={artistInput} bind:value={artist} /></label>
   <label>Date<input name="date" type="date" bind:value={date} /></label>

@@ -12,6 +12,10 @@
 
   let showAdd = false;
   let editingItem: { id: string; data: { artist?: string; date?: string; venue?: string } } | null = null;
+  // year selection for per-year tops
+  let selectedYear: number = new Date().getFullYear();
+  // pendingNew may belong to a different year than currently selected
+  let pendingNewYear: number | null = null;
   let theme: 'light' | 'dark' = 'light';
   let showCompare = false;
   let showActionsMenu = false;
@@ -23,8 +27,11 @@
   let itemsForDisplay: Array<any> = [];
   let importInput: HTMLInputElement | null = null;
 
-  const rankingKey = { type: 'concert', year: new Date().getFullYear() };
-  const rankingStoreKey = `${rankingKey.type}:${rankingKey.year}`;
+  // reactive ranking key and its store key (scoped to selectedYear)
+  let rankingKey: { type: string; year: number } = { type: 'concert', year: selectedYear };
+  let rankingStoreKey = `${rankingKey.type}:${rankingKey.year}`;
+  $: rankingKey = { type: 'concert', year: selectedYear };
+  $: rankingStoreKey = `${rankingKey.type}:${rankingKey.year}`;
 
   $: {
     const ids = $rankings?.[rankingStoreKey] || [];
@@ -36,9 +43,13 @@
     const item = { id, type: 'concert', createdAt: new Date().toISOString(), data };
     await addItem(item);
 
-    currentRanking = await getRanking(rankingKey);
+    // Determine the year for ranking: use the event date year if provided, otherwise use selectedYear
+    const yearOfItem = data.date ? new Date(data.date).getFullYear() : selectedYear;
+    pendingNewYear = yearOfItem;
+    const targetKey = { type: 'concert', year: yearOfItem };
+    currentRanking = await getRanking(targetKey);
     if (!currentRanking || currentRanking.length === 0) {
-      await insertAt(rankingKey, 0, id);
+      await insertAt(targetKey, 0, id);
     } else {
       pendingNew = id;
       await startInsertion();
@@ -134,6 +145,41 @@
     showAdd = false;
   }
 
+  // handle bulk-add events from AddItemModal
+  async function onAddMultiple(entries: Array<{ artist: string; date: string; venue: string }>) {
+    // filter duplicates: simple check against existing items by artist+date+venue
+    const existing = $items;
+    const toProcess: Array<{ id: string; data: { artist: string; date: string; venue: string } }> = [];
+    for (const e of entries) {
+      const key = `${e.artist}||${e.date}||${e.venue}`;
+      let dup = false;
+      for (const it of Object.values(existing)) {
+        if ((it.data.artist || '') + '||' + (it.data.date || '') + '||' + (it.data.venue || '') === key) { dup = true; break; }
+      }
+      if (!dup) {
+        const id = `i_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+        toProcess.push({ id, data: e });
+      }
+    }
+
+    // sequentially add and rank each entry
+    for (const item of toProcess) {
+      await addItem({ id: item.id, type: 'concert', createdAt: new Date().toISOString(), data: item.data });
+      // determine year for the item
+      const yearOfItem = item.data.date ? new Date(item.data.date).getFullYear() : selectedYear;
+      pendingNewYear = yearOfItem;
+      const targetKey = { type: 'concert', year: yearOfItem };
+      currentRanking = await getRanking(targetKey);
+      if (!currentRanking || currentRanking.length === 0) {
+        await insertAt(targetKey, 0, item.id);
+      } else {
+        pendingNew = item.id;
+        // start insertion flow which will present comparisons one by one
+        await startInsertion();
+      }
+    }
+  }
+
   async function onUpdateItem(id: string, data: { artist?: string; date?: string; venue?: string }) {
     // use itemsStore.updateItem
     // import lazily to avoid circular at top-level
@@ -157,10 +203,13 @@
 
   async function startInsertion() {
     if (!pendingNew) return;
-    const ranking = await getRanking(rankingKey);
+    const year = pendingNewYear ?? selectedYear;
+    const key = { type: 'concert', year };
+    const ranking = await getRanking(key);
     const res = await findInsertIndex(ranking, pendingNew, compareFn);
-    await insertAt(rankingKey, res.index, pendingNew);
+    await insertAt(key, res.index, pendingNew);
     pendingNew = null;
+    pendingNewYear = null;
     showCompare = false;
   }
 
@@ -177,6 +226,14 @@
     <div class="title-block">
       <h1>Top Maker</h1>
       <p>Track and compare your best concerts of the year.</p>
+      <div class="year-select">
+        <label for="year-select">Year:</label>
+        <select id="year-select" bind:value={selectedYear} aria-label="Select year">
+          {#each Array(new Date().getFullYear() - 2020 + 1) as _, i}
+            <option value={2020 + i}>{2020 + i}</option>
+          {/each}
+        </select>
+      </div>
     </div>
     <div class="top-actions">
       <button
@@ -237,6 +294,7 @@
       initial={null}
       mode={'add'}
       on:add={(ev) => (ev.detail.rank ? onAddAndRank(ev.detail.data) : onAddWithoutRanking(ev.detail.data))}
+      on:add-multiple={(ev) => onAddMultiple(ev.detail.entries)}
       on:cancel={() => { showAdd = false }}
     />
   {/if}
@@ -249,6 +307,7 @@
     />
   {/if}
 
+  <h2 class="top-year">Top of {selectedYear}</h2>
   <RankedList
     items={itemsForDisplay}
     editingId={editingItem ? editingItem.id : null}

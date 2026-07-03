@@ -8,7 +8,13 @@ const browser = typeof indexedDB !== 'undefined';
 const DB_NAME = 'topmaker';
 const DB_VERSION = 1;
 
-const dbPromise = browser ? openDB(DB_NAME, DB_VERSION) : null;
+const dbPromise = browser
+  ? openDB(DB_NAME, DB_VERSION, {
+      upgrade(db) {
+        if (!db.objectStoreNames.contains('rankings')) db.createObjectStore('rankings');
+      }
+    })
+  : null;
 
 function keyFor(k: RankingKey) {
   return `${k.type}:${k.year ?? 'all'}`;
