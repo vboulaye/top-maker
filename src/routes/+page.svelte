@@ -407,3 +407,19 @@
     <div role="alert" class="storage-error">{$storageStatus.lastError}</div>
   {/if}
 </main>
+
+<style>
+  /* Backup button: subtle default, highlight when connected */
+  .backup-button {
+    border: 1px solid #bbb;
+    background: transparent;
+    color: inherit;
+    padding: 6px 10px;
+    border-radius: 4px;
+  }
+  .backup-button.connected {
+    background: #0a84ff; /* blue */
+    color: white;
+    border-color: #0866d6;
+  }
+</style>
