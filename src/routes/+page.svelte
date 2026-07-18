@@ -139,6 +139,7 @@
   // Token indicator state - refresh every 30s so expiry display updates
   let tokenLabel = 'Unknown';
   let tokenTooltip = '';
+  let isConnected = false;
   let now = Date.now();
   let _int: any = null;
   function updateTokenStatus() {
@@ -147,24 +148,29 @@
       if (!toks) {
         tokenLabel = 'Not connected';
         tokenTooltip = 'No OneDrive tokens stored';
+        isConnected = false;
         return;
       }
       if (toks.expires_at && now > toks.expires_at) {
         if (toks.refresh_token) {
           tokenLabel = 'Expired (refresh available)';
           tokenTooltip = `Expired at ${new Date(toks.expires_at).toLocaleString()}`;
+          isConnected = true; // can refresh so treat as connected
         } else {
           tokenLabel = 'Expired';
           tokenTooltip = `Expired at ${new Date(toks.expires_at).toLocaleString()} (no refresh token)`;
+          isConnected = false;
         }
         return;
       }
       if (toks.expires_at) {
         tokenLabel = `Connected (expires ${new Date(toks.expires_at).toLocaleString()})`;
         tokenTooltip = `Access token valid until ${new Date(toks.expires_at).toLocaleString()}`;
+        isConnected = true;
       } else {
         tokenLabel = 'Connected';
         tokenTooltip = 'Tokens present (no expiry info)';
+        isConnected = true;
       }
     } catch (e) {
       tokenLabel = 'Unknown';
@@ -317,7 +323,7 @@
     </div>
     <div class="top-actions">
       <div class="header-actions">
-        <button class="secondary" on:click={async () => {
+        <button class="secondary backup-button" class:connected={isConnected} on:click={async () => {
           try {
             // Keep a single backup file (overwrite previous) so only the last backup is kept
             const path = `/Apps/TopMaker/top-maker.json`;
