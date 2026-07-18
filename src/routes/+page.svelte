@@ -466,6 +466,13 @@
     color: white;
     border-color: #0866d6;
   }
+  /* Keep header action buttons stable width so labels/spinner don't resize layout */
+  .header-actions .secondary {
+    min-width: 8.5rem;        /* sensible default — ~136px */
+    white-space: nowrap;      /* keep label on one line */
+    text-align: center;       /* center label when it changes */
+    box-sizing: border-box;
+  }
   .spinner {
     display: inline-block;
     width: 12px;
