@@ -28,8 +28,10 @@
       await OneDrive.ensureAuthenticatedInteractive();
       storageStatus.update((s) => ({ ...s, lastAction: 'connected-onedrive', lastError: null }));
     } catch (e) {
-      storageStatus.update((s) => ({ ...s, lastError: 'failed-connect-onedrive' }));
-      console.error(e);
+      // include error message
+      const msg = e instanceof Error ? e.message : String(e);
+      storageStatus.update((s) => ({ ...s, lastError: `failed-connect-onedrive: ${msg}` }));
+      console.error('OneDrive connect error:', e);
     }
   }
 

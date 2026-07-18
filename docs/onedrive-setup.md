@@ -36,11 +36,14 @@ High-level steps
 4) Configure your app (local dev)
 - Create a `.env.local` (or set env vars in your Vite environment) with:
 
-  VITE_ONEDRIVE_CLIENT_ID=your-client-id-here
+  PUBLIC_ONEDRIVE_CLIENT_ID=your-client-id-here
   # Optional: override the preview dev port if running on a different port
   VITE_PREVIEW_PORT=4173
 
 - Restart the dev server after changing env vars.
+
+Environment note
+- Store your `PUBLIC_ONEDRIVE_CLIENT_ID` in a local env file (for dev) and in your hosting platform for production. The code reads it from `import.meta.env.PUBLIC_ONEDRIVE_CLIENT_ID`.
 
 5) Test the flow in the app
 - The app uses an interactive popup to authenticate. In the browser go to your running app (e.g., `http://localhost:4173`).

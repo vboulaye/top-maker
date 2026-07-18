@@ -106,10 +106,15 @@ export async function saveToOneDrive(path = '/top-maker.json') {
     await OneDrive.ensureAuthenticatedInteractive();
     const snapshot = buildSnapshot({ items: await exportItems(), rankings: await exportRankings(), comparisons: await exportComparisons() });
     const json = snapshotToJson(snapshot);
-    await OneDrive.uploadFileToOneDrive(path, json);
-    storageStatus.update((s) => ({ ...s, lastAction: 'saved-onedrive', lastError: null }));
+    const res = await OneDrive.uploadFileToOneDrive(path, json);
+    // include some details in lastAction for debugging (file id or name if present)
+    const info = res && (res.id || res.name) ? `saved-onedrive:${res.name || res.id}` : 'saved-onedrive';
+    storageStatus.update((s) => ({ ...s, lastAction: info, lastError: null }));
+    return res;
   } catch (err) {
-    storageStatus.update((s) => ({ ...s, lastError: 'failed-save-onedrive' }));
+    // surface error message for debugging
+    const msg = err instanceof Error ? err.message : String(err);
+    storageStatus.update((s) => ({ ...s, lastError: `failed-save-onedrive: ${msg}` }));
     throw err;
   }
 }

@@ -13,7 +13,8 @@ function getClientId() {
   } catch (e) {
     // ignore
   }
-  return (import.meta as any).env?.VITE_ONEDRIVE_CLIENT_ID || '';
+  // SvelteKit exposes public env vars as import.meta.env.PUBLIC_*
+  return (import.meta as any).env?.PUBLIC_ONEDRIVE_CLIENT_ID || '';
 }
 const AUTH_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
 const TOKEN_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
