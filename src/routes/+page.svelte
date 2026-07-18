@@ -319,8 +319,8 @@
       <div class="header-actions">
         <button class="secondary" on:click={async () => {
           try {
-            const iso = new Date().toISOString().replace(/[:.]/g, '-');
-            const path = `/Apps/TopMaker/top-maker-${iso}.json`;
+            // Keep a single backup file (overwrite previous) so only the last backup is kept
+            const path = `/Apps/TopMaker/top-maker.json`;
             const store = await import('$lib/stores/storageStore');
             await store.saveToOneDrive(path);
             // update token indicator + storage status should already be updated by store
