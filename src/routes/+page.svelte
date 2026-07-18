@@ -19,9 +19,7 @@
   let pendingNewYear: number | null = null;
   let theme: 'light' | 'dark' = 'light';
   let showCompare = false;
-  let showActionsMenu = false;
-  let actionsEl: HTMLElement | null = null;
-  let actionsToggleEl: HTMLElement | null = null;
+  // Actions menu removed; only backup/logout buttons retained
   let pendingNew: string | null = null;
   let comparePair: { newId: string; otherId: string; resolve: (value: 'a' | 'b' | 'tie' | 'unsure') => void } | null = null;
   let currentRanking: string[] = [];
@@ -105,26 +103,7 @@
     } else {
       applyTheme('light');
     }
-    // click-outside and escape handler for actions menu
-    const onDoc = (e: MouseEvent) => {
-      const target = e.target as Node | null;
-      if (!showActionsMenu) return;
-      if (actionsEl && actionsToggleEl) {
-        // if the click is outside the menu and toggle, close
-        if (actionsEl.contains(target) || actionsToggleEl.contains(target)) return;
-        showActionsMenu = false;
-      }
-    };
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (!showActionsMenu) return;
-      if (e.key === 'Escape' || e.key === 'Esc') {
-        showActionsMenu = false;
-      }
-    };
-    window.addEventListener('click', onDoc);
-    window.addEventListener('keydown', onKeyDown);
-    onDestroy(() => window.removeEventListener('click', onDoc));
-    onDestroy(() => window.removeEventListener('keydown', onKeyDown));
+    // no-op: actions menu removed
     // expose a small test helper and mark that client has mounted so tests can wait for hydration
     try {
       document.documentElement.setAttribute('data-topmaker-hydrated', '1');
@@ -337,43 +316,11 @@
       </div>
     </div>
     <div class="top-actions">
-      <button
-        bind:this={actionsToggleEl}
-        class="actions-toggle secondary"
-        aria-expanded={showActionsMenu}
-        aria-pressed={showActionsMenu}
-        on:click|stopPropagation={() => { showActionsMenu = !showActionsMenu }}
-        on:keydown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showActionsMenu = !showActionsMenu } }}
-      >
-        ☰
-      </button>
-
-      {#if showActionsMenu}
-        <div bind:this={actionsEl} class="actions-menu" role="menu" tabindex="0" on:click|stopPropagation on:keydown|stopPropagation={(e) => e.stopPropagation()}>
-          <button data-test="actions-export" role="menuitem" on:click={() => { exportJsonFile(); showActionsMenu = false }} class="secondary">Export</button>
-          <!-- use a button to open the file picker for accessibility; trigger hidden input click -->
-          <button
-            role="menuitem"
-            class="file-button"
-            on:click={async () => {
-              // trigger hidden input
-              if (importInput) importInput.click();
-            }}
-          >
-            Import
-          </button>
-          
-          {#if $storageStatus.canUseFileSystemApi}
-            <button role="menuitem" on:click={() => { openFromFileHandle(); showActionsMenu = false }} class="secondary">Open File</button>
-            <button role="menuitem" on:click={() => { saveToFileHandle(); showActionsMenu = false }} class="secondary">Save File</button>
-          {/if}
-          <button role="menuitem" on:click={async () => { try { await (window as any).__topmaker_saveOneDrive && (window as any).__topmaker_saveOneDrive(); } catch (e) { console.error(e) } finally { showActionsMenu = false } }} class="secondary">Save to OneDrive</button>
-          <button role="menuitem" on:click={async () => { try { await (window as any).__topmaker_loadOneDrive && (window as any).__topmaker_loadOneDrive(); } catch (e) { console.error(e) } finally { showActionsMenu = false } }} class="secondary">Load from OneDrive</button>
-          <button role="menuitem" on:click={async () => { try { await connectOneDrive(); } catch (e) { console.error(e) } finally { showActionsMenu = false } }} class="secondary">Connect OneDrive</button>
-          <div class="menu-sep"></div>
-          <button role="menuitem" on:click={() => { toggleTheme(); showActionsMenu = false }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
-        </div>
-      {/if}
+      <div class="header-actions">
+        <button class="secondary" on:click={async () => { try { await (window as any).__topmaker_saveOneDrive && (window as any).__topmaker_saveOneDrive(); } catch (e) { console.error(e) } }}>Backup</button>
+        <button class="secondary" on:click={() => { try { localStorage.removeItem('topmaker_onedrive_tokens'); } catch (e) {} updateTokenStatus(); }}>Logout</button>
+        <button role="menuitem" on:click={() => { toggleTheme(); }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
+      </div>
     </div>
   </div>
 
