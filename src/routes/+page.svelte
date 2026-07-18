@@ -140,6 +140,8 @@
   let tokenLabel = 'Unknown';
   let tokenTooltip = '';
   let isConnected = false;
+  let isBackingUp = false;
+  let isRestoring = false;
   let now = Date.now();
   let _int: any = null;
   function updateTokenStatus() {
@@ -192,6 +194,34 @@
     const ranking = await getRanking(rankingKey);
     await insertAt(rankingKey, ranking.length, id);
     showAdd = false;
+  }
+
+  async function doBackup() {
+    try {
+      isBackingUp = true;
+      const path = `/Apps/TopMaker/top-maker.json`;
+      const store = await import('$lib/stores/storageStore');
+      await store.saveToOneDrive(path);
+      updateTokenStatus();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      isBackingUp = false;
+    }
+  }
+
+  async function doRestore() {
+    try {
+      isRestoring = true;
+      const path = `/Apps/TopMaker/top-maker.json`;
+      const store = await import('$lib/stores/storageStore');
+      await store.loadFromOneDrive(path);
+      updateTokenStatus();
+    } catch (e) {
+      console.error(e);
+    } finally {
+      isRestoring = false;
+    }
   }
 
   // handle bulk-add events from AddItemModal
@@ -323,24 +353,31 @@
     </div>
     <div class="top-actions">
       <div class="header-actions">
-        <button class="secondary backup-button" class:connected={isConnected} on:click={async () => {
-          try {
-            // Keep a single backup file (overwrite previous) so only the last backup is kept
-            const path = `/Apps/TopMaker/top-maker.json`;
-            const store = await import('$lib/stores/storageStore');
-            await store.saveToOneDrive(path);
-            // update token indicator + storage status should already be updated by store
-            updateTokenStatus();
-          } catch (e) { console.error(e) }
-        }}>Backup</button>
-        <button class="secondary" on:click={async () => {
-          try {
-            const path = `/Apps/TopMaker/top-maker.json`;
-            const store = await import('$lib/stores/storageStore');
-            await store.loadFromOneDrive(path);
-            updateTokenStatus();
-          } catch (e) { console.error(e) }
-        }}>Restore</button>
+        <button
+          class="secondary backup-button"
+          class:connected={isConnected}
+          on:click={doBackup}
+          disabled={isBackingUp || isRestoring}
+          aria-busy={isBackingUp}
+        >
+          {#if isBackingUp}
+            <span class="spinner" aria-hidden="true"></span> Backing up…
+          {:else}
+            Backup
+          {/if}
+        </button>
+        <button
+          class="secondary"
+          on:click={doRestore}
+          disabled={isBackingUp || isRestoring}
+          aria-busy={isRestoring}
+        >
+          {#if isRestoring}
+            <span class="spinner" aria-hidden="true"></span> Restoring…
+          {:else}
+            Restore
+          {/if}
+        </button>
         <button class="secondary" on:click={() => { try { localStorage.removeItem('topmaker_onedrive_tokens'); } catch (e) {} updateTokenStatus(); }}>Logout</button>
         <button role="menuitem" on:click={() => { toggleTheme(); }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
       </div>
@@ -429,5 +466,21 @@
     color: white;
     border-color: #0866d6;
   }
+  .spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: rgba(255,255,255,0.9);
+    margin-right: 6px;
+    vertical-align: middle;
+    animation: spin 1s linear infinite;
+  }
+  .secondary[disabled] {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
   /* token indicator removed by user request */
 </style>
