@@ -9,7 +9,7 @@
   import { addItem } from '$lib/stores/itemsStore';
   import { rankings, getRanking, insertAt, setRanking } from '$lib/stores/rankingStore';
   import { findInsertIndex } from '$lib/ranking/insertion.js';
-  import OneDriveSettings from '$lib/components/OneDriveSettings.svelte';
+  import { loadTokens } from '$lib/storage/onedrive';
 
   let showAdd = false;
   let editingItem: { id: string; data: { artist?: string; date?: string; venue?: string } } | null = null;
@@ -156,6 +156,49 @@
       }
     } catch (e) {}
   });
+
+  // Token indicator state - refresh every 30s so expiry display updates
+  let tokenLabel = 'Unknown';
+  let tokenTooltip = '';
+  let now = Date.now();
+  let _int: any = null;
+  function updateTokenStatus() {
+    try {
+      const toks = loadTokens();
+      if (!toks) {
+        tokenLabel = 'Not connected';
+        tokenTooltip = 'No OneDrive tokens stored';
+        return;
+      }
+      if (toks.expires_at && now > toks.expires_at) {
+        if (toks.refresh_token) {
+          tokenLabel = 'Expired (refresh available)';
+          tokenTooltip = `Expired at ${new Date(toks.expires_at).toLocaleString()}`;
+        } else {
+          tokenLabel = 'Expired';
+          tokenTooltip = `Expired at ${new Date(toks.expires_at).toLocaleString()} (no refresh token)`;
+        }
+        return;
+      }
+      if (toks.expires_at) {
+        tokenLabel = `Connected (expires ${new Date(toks.expires_at).toLocaleString()})`;
+        tokenTooltip = `Access token valid until ${new Date(toks.expires_at).toLocaleString()}`;
+      } else {
+        tokenLabel = 'Connected';
+        tokenTooltip = 'Tokens present (no expiry info)';
+      }
+    } catch (e) {
+      tokenLabel = 'Unknown';
+      tokenTooltip = String(e);
+    }
+  }
+  // start periodic updater
+  onMount(() => {
+    updateTokenStatus();
+    _int = setInterval(() => { now = Date.now(); updateTokenStatus(); }, 30000);
+  });
+  // cleanup
+  onDestroy(() => { try { if (_int) clearInterval(_int); } catch (e) {} });
 
   async function onAddWithoutRanking(data: { artist: string; date: string; venue: string }) {
     const id = `i_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
@@ -337,7 +380,7 @@
   <div class="controls">
     <button on:click={() => (showAdd = true)} class="primary">Add</button>
     <div class="spacer"></div>
-    <OneDriveSettings />
+    <div class="token-indicator" title={tokenTooltip}>{tokenLabel}</div>
   </div>
 
   <!-- Hidden import input placed after controls so tests can locate it reliably -->
