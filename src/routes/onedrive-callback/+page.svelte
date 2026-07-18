@@ -6,21 +6,12 @@
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
       const state = params.get('state');
-      // Log for debugging so we can inspect the popup's console if needed
-      try { console.debug('[onedrive-callback] code=', code, 'state=', state, 'origin=', window.location.origin); } catch (e) {}
       if (window.opener && code) {
-        // Use '*' temporarily so origin mismatches don't prevent delivery while debugging
-        try { window.opener.postMessage({ type: 'onedrive_code', code, state }, '*'); } catch (e) { try { console.error('[onedrive-callback] postMessage failed', e); } catch (e) {} }
+        window.opener.postMessage({ type: 'onedrive_code', code, state }, window.location.origin);
       }
-      // Expose code/state in the DOM so the user can visually confirm what the popup received
-      const container = document.getElementById('debug');
-      if (container) {
-        container.innerText = `code=${code || ''}\nstate=${state || ''}\norigin=${window.location.origin}`;
-      }
-    } catch (e) {
-      try { console.error('[onedrive-callback] error reading params', e); } catch (e) {}
-    }
-    // NOTE: Do NOT auto-close while debugging so you can inspect the popup. Close manually when ready.
+    } catch (e) {}
+    // close window after a short delay to allow message to be processed
+    setTimeout(() => { try { window.close(); } catch (e) {} }, 500);
   })();
 </script>
 
