@@ -18,8 +18,9 @@ function getClientId() {
   }
   return PUBLIC_ONEDRIVE_CLIENT_ID || '';
 }
-const AUTH_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
-const TOKEN_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
+// Use the consumers endpoint since this app only targets personal Microsoft accounts
+const AUTH_ENDPOINT = 'https://login.microsoftonline.com/consumers/oauth2/v2.0/authorize';
+const TOKEN_ENDPOINT = 'https://login.microsoftonline.com/consumers/oauth2/v2.0/token';
 const SCOPES = ['Files.ReadWrite', 'offline_access', 'User.Read'].join(' ');
 
 function base64UrlEncode(buffer: ArrayBuffer) {
