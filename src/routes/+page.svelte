@@ -333,6 +333,14 @@
             updateTokenStatus();
           } catch (e) { console.error(e) }
         }}>Backup</button>
+        <button class="secondary" on:click={async () => {
+          try {
+            const path = `/Apps/TopMaker/top-maker.json`;
+            const store = await import('$lib/stores/storageStore');
+            await store.loadFromOneDrive(path);
+            updateTokenStatus();
+          } catch (e) { console.error(e) }
+        }}>Restore</button>
         <button class="secondary" on:click={() => { try { localStorage.removeItem('topmaker_onedrive_tokens'); } catch (e) {} updateTokenStatus(); }}>Logout</button>
         <button role="menuitem" on:click={() => { toggleTheme(); }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
       </div>
