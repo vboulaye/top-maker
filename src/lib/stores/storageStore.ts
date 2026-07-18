@@ -28,6 +28,32 @@ try {
   }
 } catch (e) {}
 
+// Helper to surface detailed debug info in the console
+try {
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.__topmaker_onedrive_status = () => ({ lastAction: null, lastError: null, tokens: null, clientIdOverride: null });
+  }
+} catch (e) {}
+
+// Provide a richer runtime inspector that actually returns live state
+try {
+  if (typeof window !== 'undefined') {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.__topmaker_onedrive_status = () => {
+      let s: any;
+      storageStatus.subscribe((v) => (s = v))();
+      let toks = null;
+      try { toks = (window as any).localStorage.getItem('topmaker_onedrive_tokens'); } catch (e) {}
+      let cid = null;
+      try { cid = (window as any).localStorage.getItem('topmaker_onedrive_client_id_override') || (import.meta as any).env?.PUBLIC_ONEDRIVE_CLIENT_ID || null; } catch (e) {}
+      return { status: s, tokens: toks ? JSON.parse(toks) : null, clientId: cid };
+    };
+  }
+} catch (e) {}
+
 export async function exportJsonFile() {
   try {
     const snapshot = buildSnapshot({

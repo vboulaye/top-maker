@@ -51,7 +51,7 @@
   <h3>OneDrive Settings</h3>
   <label>
     Client ID (override for debugging)
-    <input bind:value={$clientId} placeholder="VITE_ONEDRIVE_CLIENT_ID or override here" />
+    <input bind:value={$clientId} placeholder="PUBLIC_ONEDRIVE_CLIENT_ID or override here" />
   </label>
   <label>
     Backup path

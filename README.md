@@ -28,6 +28,6 @@ Contributing
 - Open a PR for any change and ensure unit tests pass. Run Playwright E2E tests locally when changing flows that affect the UI.
 
 OneDrive setup
-- This project supports saving and loading snapshots to OneDrive using OAuth2 Authorization Code + PKCE. See `docs/onedrive-setup.md` for step-by-step instructions to register an Azure app and configure the `VITE_ONEDRIVE_CLIENT_ID` environment variable.
+- This project supports saving and loading snapshots to OneDrive using OAuth2 Authorization Code + PKCE. See `docs/onedrive-setup.md` for step-by-step instructions to register an Azure app and configure the `PUBLIC_ONEDRIVE_CLIENT_ID` environment variable.
 
-Local dev note: set `VITE_ONEDRIVE_CLIENT_ID` in a `.env.local` file (or in your hosting platform) and restart the dev server.
+Local dev note: set `PUBLIC_ONEDRIVE_CLIENT_ID` in a `.env.local` file (or in your hosting platform) and restart the dev server.

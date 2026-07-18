@@ -2,6 +2,9 @@
 // Requires VITE_ONEDRIVE_CLIENT_ID to be set in the Vite env.
 
 import { tick } from 'svelte';
+import {
+  PUBLIC_ONEDRIVE_CLIENT_ID
+} from '$env/static/public';
 
 function getClientId() {
   // Prefer a runtime override stored in localStorage for debugging; fall back to the build-time Vite env var.
@@ -13,8 +16,7 @@ function getClientId() {
   } catch (e) {
     // ignore
   }
-  // SvelteKit exposes public env vars as import.meta.env.PUBLIC_*
-  return (import.meta as any).env?.PUBLIC_ONEDRIVE_CLIENT_ID || '';
+  return PUBLIC_ONEDRIVE_CLIENT_ID || '';
 }
 const AUTH_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
 const TOKEN_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
@@ -110,7 +112,8 @@ async function refreshToken(refresh_token: string) {
 }
 
 export async function ensureAuthenticatedInteractive() {
-  if (!CLIENT_ID) throw new Error('missing-onedrive-client-id');
+  const clientId = getClientId();
+  if (!clientId) throw new Error('missing-onedrive-client-id');
   // PKCE
   const code_verifier = randomString(64);
   const code_challenge = await sha256(code_verifier);
@@ -119,14 +122,17 @@ export async function ensureAuthenticatedInteractive() {
   sessionStorage.setItem('onedrive_code_verifier', code_verifier);
   sessionStorage.setItem('onedrive_state', state);
 
-  const authUrl = `${AUTH_ENDPOINT}?client_id=${encodeURIComponent(CLIENT_ID)}&response_type=code&redirect_uri=${encodeURIComponent(redirect)}&response_mode=query&scope=${encodeURIComponent(SCOPES)}&code_challenge=${encodeURIComponent(code_challenge)}&code_challenge_method=S256&state=${encodeURIComponent(state)}`;
+
+  const authUrl = `${AUTH_ENDPOINT}?client_id=${encodeURIComponent(clientId)}&response_type=code&redirect_uri=${encodeURIComponent(redirect)}&response_mode=query&scope=${encodeURIComponent(SCOPES)}&code_challenge=${encodeURIComponent(code_challenge)}&code_challenge_method=S256&state=${encodeURIComponent(state)}`;
 
   // Open popup and wait for message
   return new Promise<TokenSet>((resolve, reject) => {
+    console.debug('[onedrive] authUrl=', authUrl, 'clientId=', getClientId());
     const w = window.open(authUrl, 'onedrive_auth', 'width=600,height=700');
     if (!w) return reject(new Error('popup-blocked'));
 
     const onMessage = async (e: MessageEvent) => {
+      console.debug('[onedrive] message received', e.data);
       if (!e.data || e.data.type !== 'onedrive_code') return;
       const { code, state: returned } = e.data;
       window.removeEventListener('message', onMessage);

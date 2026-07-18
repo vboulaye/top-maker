@@ -17,7 +17,7 @@ High-level steps
 - Navigate to "Azure Active Directory" → "App registrations" → "New registration".
 - Give it a descriptive name: e.g., "Top Maker OneDrive".
 - Supported account types: choose what fits your users (single tenant or multitenant). For local testing "Accounts in this organizational directory only" is fine.
-- Click Register and copy the "Application (client) ID" — this becomes VITE_ONEDRIVE_CLIENT_ID.
+- Click Register and copy the "Application (client) ID" — this becomes PUBLIC_ONEDRIVE_CLIENT_ID.
 
 2) Configure Redirect URI
 - Go to the registered app → Authentication.
