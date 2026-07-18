@@ -194,7 +194,11 @@ export async function getAccessToken(): Promise<string> {
 export async function uploadFileToOneDrive(path: string, content: string) {
   const access = await getAccessToken();
   // path should be like /Apps/TopMaker/filename.json or /top-maker.json
-  const encoded = encodeURIComponent(path.replace(/^\//, ''));
+  // Preserve folder separators when building the drive path. encodeURIComponent would also
+  // encode '/' which makes Graph treat the slashes as part of the file name, creating
+  // the file at the drive root with encoded slashes instead of creating folders.
+  const cleaned = path.replace(/^\//, '');
+  const encoded = cleaned.split('/').map((s) => encodeURIComponent(s)).join('/');
   const url = `https://graph.microsoft.com/v1.0/me/drive/root:/${encoded}:/content`;
   const res = await fetch(url, { method: 'PUT', headers: { Authorization: `Bearer ${access}`, 'Content-Type': 'application/json' }, body: content });
   if (!res.ok) throw new Error('onedrive-upload-failed');
@@ -203,7 +207,8 @@ export async function uploadFileToOneDrive(path: string, content: string) {
 
 export async function downloadFileFromOneDrive(path: string) {
   const access = await getAccessToken();
-  const encoded = encodeURIComponent(path.replace(/^\//, ''));
+  const cleaned = path.replace(/^\//, '');
+  const encoded = cleaned.split('/').map((s) => encodeURIComponent(s)).join('/');
   const url = `https://graph.microsoft.com/v1.0/me/drive/root:/${encoded}:/content`;
   const res = await fetch(url, { headers: { Authorization: `Bearer ${access}` } });
   if (!res.ok) throw new Error('onedrive-download-failed');
