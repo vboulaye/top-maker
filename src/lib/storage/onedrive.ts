@@ -122,6 +122,25 @@ async function refreshToken(refresh_token: string) {
 export async function ensureAuthenticatedInteractive() {
   const clientId = getClientId();
   if (!clientId) throw new Error('missing-onedrive-client-id');
+
+  // If we already have tokens stored and they are still valid, reuse them without prompting the user.
+  const existing = loadTokens();
+  if (existing) {
+    // If expires_at is set and token is not near expiry, return it. If expired and we have a refresh token, refresh.
+    if (!existing.expires_at || Date.now() <= (existing.expires_at - 60000)) {
+      return existing;
+    }
+    if (existing.refresh_token) {
+      try {
+        const refreshed = await refreshToken(existing.refresh_token);
+        return refreshed;
+      } catch (e) {
+        // fall through to interactive auth if refresh fails
+        console.debug('[onedrive] refresh failed, falling back to interactive auth', e);
+      }
+    }
+  }
+
   // PKCE
   const code_verifier = randomString(64);
   const code_challenge = await sha256(code_verifier);
