@@ -83,7 +83,11 @@ async function exchangeCodeForToken(code: string, code_verifier: string, redirec
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params.toString()
   });
-  if (!res.ok) throw new Error('token-exchange-failed');
+  if (!res.ok) {
+    const text = await res.text().catch(() => '<no body>');
+    // include remote error body for easier debugging
+    throw new Error(`token-exchange-failed: ${res.status} ${res.statusText} - ${text}`);
+  }
   const json = await res.json();
   const now = Date.now();
   const expires_at = now + (json.expires_in ? json.expires_in * 1000 : 3600 * 1000);
@@ -103,7 +107,10 @@ async function refreshToken(refresh_token: string) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: params.toString()
   });
-  if (!res.ok) throw new Error('token-refresh-failed');
+  if (!res.ok) {
+    const text = await res.text().catch(() => '<no body>');
+    throw new Error(`token-refresh-failed: ${res.status} ${res.statusText} - ${text}`);
+  }
   const json = await res.json();
   const now = Date.now();
   const expires_at = now + (json.expires_in ? json.expires_in * 1000 : 3600 * 1000);
