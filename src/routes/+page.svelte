@@ -342,8 +342,6 @@
   <div class="controls">
     <button on:click={() => (showAdd = true)} class="primary">Add</button>
     <div class="spacer"></div>
-    <!-- discreet token indicator: no text, only a small dot; tooltip contains details -->
-    <div class="token-indicator" title={tokenTooltip} aria-label={tokenTooltip} class:connected={isConnected}></div>
   </div>
 
   <!-- Hidden import input placed after controls so tests can locate it reliably -->
@@ -423,17 +421,5 @@
     color: white;
     border-color: #0866d6;
   }
-  .token-indicator {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: transparent;
-    border: 1px solid #ccc;
-    display: inline-block;
-    vertical-align: middle;
-  }
-  .token-indicator.connected {
-    background: #0a84ff;
-    border-color: #0866d6;
-  }
+  /* token indicator removed by user request */
 </style>
