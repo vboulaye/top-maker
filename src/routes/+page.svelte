@@ -317,7 +317,16 @@
     </div>
     <div class="top-actions">
       <div class="header-actions">
-        <button class="secondary" on:click={async () => { try { await (window as any).__topmaker_saveOneDrive && (window as any).__topmaker_saveOneDrive(); } catch (e) { console.error(e) } }}>Backup</button>
+        <button class="secondary" on:click={async () => {
+          try {
+            const iso = new Date().toISOString().replace(/[:.]/g, '-');
+            const path = `/Apps/TopMaker/top-maker-${iso}.json`;
+            const store = await import('$lib/stores/storageStore');
+            await store.saveToOneDrive(path);
+            // update token indicator + storage status should already be updated by store
+            updateTokenStatus();
+          } catch (e) { console.error(e) }
+        }}>Backup</button>
         <button class="secondary" on:click={() => { try { localStorage.removeItem('topmaker_onedrive_tokens'); } catch (e) {} updateTokenStatus(); }}>Logout</button>
         <button role="menuitem" on:click={() => { toggleTheme(); }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
       </div>
