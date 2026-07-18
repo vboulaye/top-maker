@@ -3,7 +3,18 @@
 
 import { tick } from 'svelte';
 
-const CLIENT_ID = (import.meta as any).env?.VITE_ONEDRIVE_CLIENT_ID || '';
+function getClientId() {
+  // Prefer a runtime override stored in localStorage for debugging; fall back to the build-time Vite env var.
+  try {
+    if (typeof window !== 'undefined') {
+      const override = localStorage.getItem('topmaker_onedrive_client_id_override');
+      if (override) return override;
+    }
+  } catch (e) {
+    // ignore
+  }
+  return (import.meta as any).env?.VITE_ONEDRIVE_CLIENT_ID || '';
+}
 const AUTH_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/authorize';
 const TOKEN_ENDPOINT = 'https://login.microsoftonline.com/common/oauth2/v2.0/token';
 const SCOPES = ['Files.ReadWrite', 'offline_access', 'User.Read'].join(' ');
@@ -57,7 +68,7 @@ export function clearTokens() {
 
 async function exchangeCodeForToken(code: string, code_verifier: string, redirect_uri: string) {
   const params = new URLSearchParams();
-  params.set('client_id', CLIENT_ID);
+  params.set('client_id', getClientId());
   params.set('grant_type', 'authorization_code');
   params.set('code', code);
   params.set('redirect_uri', redirect_uri);
@@ -79,7 +90,7 @@ async function exchangeCodeForToken(code: string, code_verifier: string, redirec
 
 async function refreshToken(refresh_token: string) {
   const params = new URLSearchParams();
-  params.set('client_id', CLIENT_ID);
+  params.set('client_id', getClientId());
   params.set('grant_type', 'refresh_token');
   params.set('refresh_token', refresh_token);
 

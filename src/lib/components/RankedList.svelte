@@ -84,6 +84,23 @@
     delete editBuffers[id];
     dispatch('cancel-edit');
   }
+
+  // Emit move events for parent to handle actual ranking mutations
+  function moveUp(id: string) {
+    dispatch('move-up', { id });
+  }
+
+  function moveDown(id: string) {
+    dispatch('move-down', { id });
+  }
+
+  function isFirst(id: string) {
+    return items && items.length > 0 && items[0] && items[0].id === id;
+  }
+
+  function isLast(id: string) {
+    return items && items.length > 0 && items[items.length - 1].id === id;
+  }
 </script>
 
 <div class="ranked-table-wrapper">
@@ -133,6 +150,24 @@
           <td class="col-actions">
             {#if editingId === item.id}
               <div class="edit-actions">
+                <!-- Manual rank controls: Move Up / Move Down -->
+                <button
+                  class="edit-button"
+                  aria-label="Move item up"
+                  on:click|stopPropagation={() => moveUp(item.id)}
+                  disabled={isFirst(item.id)}
+                >
+                  ▲
+                </button>
+                <button
+                  class="edit-button"
+                  aria-label="Move item down"
+                  on:click|stopPropagation={() => moveDown(item.id)}
+                  disabled={isLast(item.id)}
+                >
+                  ▼
+                </button>
+
                 <button class="save" on:click={() => saveEdit(item.id)}>Save</button>
                 <button class="cancel" on:click={() => cancelEditLocal(item.id)}>Cancel</button>
               </div>

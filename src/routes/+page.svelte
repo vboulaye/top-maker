@@ -7,8 +7,9 @@
   // undo feature removed
   import { items } from '$lib/stores/itemsStore';
   import { addItem } from '$lib/stores/itemsStore';
-  import { rankings, getRanking, insertAt } from '$lib/stores/rankingStore';
+  import { rankings, getRanking, insertAt, setRanking } from '$lib/stores/rankingStore';
   import { findInsertIndex } from '$lib/ranking/insertion.js';
+  import OneDriveSettings from '$lib/components/OneDriveSettings.svelte';
 
   let showAdd = false;
   let editingItem: { id: string; data: { artist?: string; date?: string; venue?: string } } | null = null;
@@ -68,6 +69,26 @@
 
   function toggleTheme() {
     applyTheme(theme === 'dark' ? 'light' : 'dark');
+  }
+
+  // Expose short helpers for OneDrive connect/backup for convenience
+  async function connectOneDrive() {
+    try {
+      await (await import('$lib/storage/onedrive')).ensureAuthenticatedInteractive();
+    } catch (e) {
+      console.error('OneDrive connect failed', e);
+    }
+  }
+
+  async function backupToOneDrive() {
+    try {
+      // default path uses ISO timestamp
+      const iso = new Date().toISOString().replace(/[:.]/g, '-');
+      const path = `/Apps/TopMaker/top-maker-${iso}.json`;
+      await (await import('$lib/stores/storageStore')).saveToOneDrive(path);
+    } catch (e) {
+      console.error('OneDrive backup failed', e);
+    }
   }
 
   onMount(() => {
@@ -194,6 +215,43 @@
     } catch (e) {}
   }
 
+  // handlers for manual move controls from RankedList
+  async function onMoveUp(id: string) {
+    const key = { type: 'concert', year: selectedYear };
+    const ranking = await getRanking(key);
+    const idx = ranking.indexOf(id);
+    if (idx === -1) {
+      console.warn('onMoveUp: item id not found in ranking', id);
+      return;
+    }
+    if (idx === 0) return; // already first
+    const next = [...ranking];
+    const tmp = next[idx - 1];
+    next[idx - 1] = next[idx];
+    next[idx] = tmp;
+    await setRanking(key, next);
+    // refresh local view
+    currentRanking = next;
+  }
+
+  async function onMoveDown(id: string) {
+    const key = { type: 'concert', year: selectedYear };
+    const ranking = await getRanking(key);
+    const idx = ranking.indexOf(id);
+    if (idx === -1) {
+      console.warn('onMoveDown: item id not found in ranking', id);
+      return;
+    }
+    if (idx === ranking.length - 1) return; // already last
+    const next = [...ranking];
+    const tmp = next[idx + 1];
+    next[idx + 1] = next[idx];
+    next[idx] = tmp;
+    await setRanking(key, next);
+    // refresh local view
+    currentRanking = next;
+  }
+
   function compareFn(newId: string, otherId: string) {
     return new Promise<'a' | 'b' | 'tie' | 'unsure'>((resolve) => {
       comparePair = { newId, otherId, resolve };
@@ -268,6 +326,7 @@
           {/if}
           <button role="menuitem" on:click={async () => { try { await (window as any).__topmaker_saveOneDrive && (window as any).__topmaker_saveOneDrive(); } catch (e) { console.error(e) } finally { showActionsMenu = false } }} class="secondary">Save to OneDrive</button>
           <button role="menuitem" on:click={async () => { try { await (window as any).__topmaker_loadOneDrive && (window as any).__topmaker_loadOneDrive(); } catch (e) { console.error(e) } finally { showActionsMenu = false } }} class="secondary">Load from OneDrive</button>
+          <button role="menuitem" on:click={async () => { try { await connectOneDrive(); } catch (e) { console.error(e) } finally { showActionsMenu = false } }} class="secondary">Connect OneDrive</button>
           <div class="menu-sep"></div>
           <button role="menuitem" on:click={() => { toggleTheme(); showActionsMenu = false }} class="secondary">{theme === 'dark' ? 'Switch to Light' : 'Switch to Dark'}</button>
         </div>
@@ -278,6 +337,7 @@
   <div class="controls">
     <button on:click={() => (showAdd = true)} class="primary">Add</button>
     <div class="spacer"></div>
+    <OneDriveSettings />
   </div>
 
   <!-- Hidden import input placed after controls so tests can locate it reliably -->
@@ -332,6 +392,8 @@
         if (el) el.focus();
       } catch (e) {}
     }}
+    on:move-up={async (e) => { await onMoveUp(e.detail.id); }}
+    on:move-down={async (e) => { await onMoveDown(e.detail.id); }}
   />
   {#if $storageStatus.lastAction}
     <div class="storage-status">{$storageStatus.lastAction}</div>
