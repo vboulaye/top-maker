@@ -12,6 +12,11 @@ jobs:
     defaults:
       run:
         working-directory: .
+    # expose the secret into the job environment so we can write it to a runtime .env file
+    env:
+      PUBLIC_ONEDRIVE_CLIENT_ID: ${{ secrets.PUBLIC_ONEDRIVE_CLIENT_ID }}
+    environment: pages
+
     steps:
       - uses: actions/checkout@v4
       - name: Use Node.js
@@ -22,6 +27,11 @@ jobs:
         run: npm ci
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
+      - name: Create .env from secret
+        # write only the expected public key into a local .env file for the build
+        # avoid printing the secret value to logs
+        run: |
+          printf 'PUBLIC_ONEDRIVE_CLIENT_ID=%s\n' "$PUBLIC_ONEDRIVE_CLIENT_ID" > .env
       - name: Build
         run: npm run build
       - name: Preview site
