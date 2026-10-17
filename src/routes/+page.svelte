@@ -7,6 +7,7 @@
   // undo feature removed
   import { items } from '$lib/stores/itemsStore';
   import { addItem } from '$lib/stores/itemsStore';
+  import { deduplicateEntries } from '$lib/items/deduplicateEntries';
   import { rankings, getRanking, insertAt, setRanking } from '$lib/stores/rankingStore';
   import { findInsertIndex } from '$lib/ranking/insertion.js';
   import { loadTokens } from '$lib/storage/onedrive';
@@ -226,19 +227,12 @@
 
   // handle bulk-add events from AddItemModal
   async function onAddMultiple(entries: Array<{ artist: string; date: string; venue: string }>) {
-    // filter duplicates: simple check against existing items by artist+date+venue
-    const existing = $items;
+    // Recheck against the current store in case it changed after the modal preview.
+    const uniqueEntries = deduplicateEntries(entries, Object.values($items));
     const toProcess: Array<{ id: string; data: { artist: string; date: string; venue: string } }> = [];
-    for (const e of entries) {
-      const key = `${e.artist}||${e.date}||${e.venue}`;
-      let dup = false;
-      for (const it of Object.values(existing)) {
-        if ((it.data.artist || '') + '||' + (it.data.date || '') + '||' + (it.data.venue || '') === key) { dup = true; break; }
-      }
-      if (!dup) {
-        const id = `i_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
-        toProcess.push({ id, data: e });
-      }
+    for (const e of uniqueEntries) {
+      const id = `i_${Date.now()}_${Math.random().toString(36).slice(2,8)}`;
+      toProcess.push({ id, data: e });
     }
 
     // sequentially add and rank each entry
@@ -402,6 +396,7 @@
     <AddItemModal
       initial={null}
       mode={'add'}
+      existingItems={Object.values($items)}
       on:add={(ev) => (ev.detail.rank ? onAddAndRank(ev.detail.data) : onAddWithoutRanking(ev.detail.data))}
       on:add-multiple={(ev) => onAddMultiple(ev.detail.entries)}
       on:cancel={() => { showAdd = false }}

@@ -1,6 +1,8 @@
 <script lang="ts">
   import { createEventDispatcher, tick } from 'svelte';
-  export let onAddAndRank: (data: any) => void;
+  import { deduplicateEntries } from '$lib/items/deduplicateEntries';
+  export let onAddAndRank: (data: any) => void = () => {};
+  export let existingItems: Array<{ data: { artist?: string; date?: string; venue?: string } }> = [];
   // initial values when used for editing
   export let initial: { artist?: string; date?: string; venue?: string } | null = null;
   export let mode: 'add' | 'edit' = 'add';
@@ -113,12 +115,12 @@
   }
 
   function updateBulkPreview() {
-    bulkPreview = parseMultiple(bulkText);
+    bulkPreview = deduplicateEntries(parseMultiple(bulkText), existingItems);
   }
 
   function submitBulk() {
     // dispatch an event with parsed entries
-    const entries = parseMultiple(bulkText);
+    const entries = deduplicateEntries(parseMultiple(bulkText), existingItems);
     if (entries.length === 0) return;
     dispatch('add-multiple', { entries });
     bulkText = '';
