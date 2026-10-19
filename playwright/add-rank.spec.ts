@@ -11,11 +11,11 @@ test('add and rank flow inserts new item via comparisons', async ({ page }) => {
   // use the test helper to reliably open the Add modal in headless environments
   await page.waitForSelector('[data-topmaker-hydrated="1"]');
   await page.evaluate(() => (window as any).__topmaker_openAdd && (window as any).__topmaker_openAdd());
-  await page.getByLabel('Artist').waitFor({ state: 'visible', timeout: 10000 });
-  await page.getByLabel('Artist').waitFor({ state: 'visible' });
-  await page.getByLabel('Artist').fill('First Artist');
-  await page.getByLabel('Date').fill('2026-06-01');
-  await page.getByLabel('Venue').fill('Venue One');
+  const addDialog = page.getByRole('dialog');
+  await addDialog.getByLabel('Artist').waitFor({ state: 'visible', timeout: 10000 });
+  await addDialog.getByLabel('Artist').fill('First Artist');
+  await addDialog.getByLabel('Date').fill('2026-06-01');
+  await addDialog.getByLabel('Venue').fill('Venue One');
   // click Add and Rank to add the first item (rankings start empty so it will be inserted)
   await page.click('button:has-text("Add and Rank")');
 
@@ -23,10 +23,11 @@ test('add and rank flow inserts new item via comparisons', async ({ page }) => {
 
   // Now add second item and choose to rank
   await page.evaluate(() => (window as any).__topmaker_openAdd && (window as any).__topmaker_openAdd());
-  await page.getByLabel('Artist').waitFor({ state: 'visible', timeout: 10000 });
-  await page.getByLabel('Artist').fill('Second Artist');
-  await page.getByLabel('Date').fill('2026-06-02');
-  await page.getByLabel('Venue').fill('Venue Two');
+  const secondAddDialog = page.getByRole('dialog');
+  await secondAddDialog.getByLabel('Artist').waitFor({ state: 'visible', timeout: 10000 });
+  await secondAddDialog.getByLabel('Artist').fill('Second Artist');
+  await secondAddDialog.getByLabel('Date').fill('2026-06-02');
+  await secondAddDialog.getByLabel('Venue').fill('Venue Two');
   await page.click('button:has-text("Add and Rank")');
 
   // Comparison modal should appear comparing Second vs First
@@ -38,7 +39,7 @@ test('add and rank flow inserts new item via comparisons', async ({ page }) => {
   await page.click('button#btn-better');
 
   // After insertion, verify order: Second Artist above First Artist
-  const rows = page.locator('.rank-row');
+  const rows = page.locator('.ranked-table tbody tr');
   await expect(rows.nth(0)).toContainText('Second Artist');
   await expect(rows.nth(1)).toContainText('First Artist');
 });

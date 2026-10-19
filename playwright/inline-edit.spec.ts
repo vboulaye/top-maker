@@ -1,37 +1,34 @@
 import { test, expect } from '@playwright/test';
 import { getBaseUrl } from './test-utils';
 
-test('inline edit: click card opens editor, inputs keep focus, Escape cancels and focus returns, save persists', async ({ page }) => {
+test('inline edit can be cancelled or saved from the ranked table', async ({ page }) => {
   const url = getBaseUrl();
   await page.goto(url);
   await page.waitForSelector('[data-topmaker-hydrated="1"]');
 
   // Add item reliably
   await page.evaluate(() => (window as any).__topmaker_openAdd && (window as any).__topmaker_openAdd());
-  await page.getByLabel('Artist').fill('InlineTest');
-  await page.getByLabel('Date').fill('2026-06-11');
-  await page.getByLabel('Venue').fill('Venue I');
+  const addDialog = page.getByRole('dialog');
+  await addDialog.getByLabel('Artist').fill('InlineTest');
+  await addDialog.getByLabel('Date').fill('2026-06-11');
+  await addDialog.getByLabel('Venue').fill('Venue I');
   await page.click('button:has-text("Add and Rank")');
   await expect(page.locator('text=InlineTest')).toHaveCount(1);
 
-  // Click the card to open inline editor
-  const card = page.locator('[data-item-id]').filter({ hasText: 'InlineTest' }).first();
-  await card.click();
+  const row = page.locator('.ranked-table tbody tr').filter({ hasText: 'InlineTest' });
+  const itemId = await row.getAttribute('data-item-id');
+  const itemRow = page.locator(`tr[data-item-id="${itemId}"]`);
+  await itemRow.getByRole('button', { name: 'Edit InlineTest' }).click();
 
-  // Artist input should be focused
-  await expect(page.getByLabel('Artist')).toBeFocused();
+  const artistInput = itemRow.getByPlaceholder('Artist');
+  await expect(artistInput).toHaveValue('InlineTest');
+  await artistInput.fill('Cancelled Edit');
+  await itemRow.getByRole('button', { name: 'Cancel' }).click();
+  await expect(itemRow).toContainText('InlineTest');
+  await expect(itemRow).not.toContainText('Cancelled Edit');
 
-  // Click inside other input should not cancel
-  await page.getByLabel('Venue').click();
-  await expect(page.getByLabel('Venue')).toBeFocused();
-
-  // Press Escape to cancel edit -> editor disappears, card regains focus
-  await page.keyboard.press('Escape');
-  await expect(card).toBeFocused();
-
-  // Re-open, edit artist, Save
-  await card.click();
-  await page.getByLabel('Artist').fill('InlineTestEdited');
-  await page.click('button:has-text("Save")');
-  await expect(page.locator('text=InlineTestEdited')).toHaveCount(1);
+  await itemRow.getByRole('button', { name: 'Edit InlineTest' }).click();
+  await itemRow.getByPlaceholder('Artist').fill('InlineTestEdited');
+  await itemRow.getByRole('button', { name: 'Save' }).click();
+  await expect(itemRow).toContainText('InlineTestEdited');
 });

@@ -65,7 +65,9 @@ async function main() {
     process.exit(2);
   }
 
-  const runner = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['playwright', 'test', '--config=playwright.config.ts'], { stdio: 'inherit' });
+  const runner = spawn(process.platform === 'win32' ? 'npx.cmd' : 'npx', ['playwright', 'test', '--config=playwright.config.ts'
+    //, '--debug'
+  ], { stdio: 'inherit' });
   runner.on('close', (code) => {
     // ensure server is killed
     cleanup();
